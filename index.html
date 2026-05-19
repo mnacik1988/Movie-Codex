@@ -3,13 +3,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Movie Mood</title>
-  <meta name="theme-color" content="#080b14">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Movie Mood">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-180.png">
   <style>
     :root {
       --ink: #f8f8ff;
@@ -155,6 +148,11 @@
       transform-origin: center;
       transition: transform .38s cubic-bezier(.2, .9, .2, 1), opacity .38s ease, filter .38s ease;
       will-change: transform, opacity, filter;
+    }
+
+    .home-stage.is-dragging .movie-card,
+    .home-stage.is-dragging .movie-info {
+      transition: none;
     }
 
     .movie-card img {
@@ -659,12 +657,24 @@
 
     function moveDeck(step) {
       const movies = visibleMovies();
-      $("#movieInfo").classList.add("is-changing");
+      const finishDx = step > 0 ? -218 : 218;
+      const info = $("#movieInfo");
+      homeStage.classList.remove("is-dragging");
+      updateCarousel(finishDx);
+      info.style.opacity = 0;
+      info.style.transform = "translateY(8px)";
       setTimeout(() => {
         activeIndex = wrapIndex(activeIndex + step, movies.length);
         dragX = 0;
         renderDeck();
-      }, 120);
+        const newInfo = $("#movieInfo");
+        newInfo.style.opacity = 0;
+        newInfo.style.transform = "translateY(8px)";
+        requestAnimationFrame(() => {
+          newInfo.style.opacity = 1;
+          newInfo.style.transform = "translateY(0)";
+        });
+      }, 380);
     }
 
     function startDrag(event) {
@@ -672,6 +682,7 @@
       dragged = false;
       dragX = 0;
       const card = event.currentTarget;
+      homeStage.classList.add("is-dragging");
       card.setPointerCapture(event.pointerId);
       card.addEventListener("pointermove", dragCard);
       card.addEventListener("pointerup", endDrag, { once: true });
@@ -694,6 +705,7 @@
       if (Math.abs(dx) > 82) {
         moveDeck(dx > 0 ? -1 : 1);
       } else {
+        homeStage.classList.remove("is-dragging");
         dragX = 0;
         updateCarousel(0);
       }
@@ -878,12 +890,6 @@
     });
 
     renderAll();
-
-    if ("serviceWorker" in navigator && location.protocol !== "file:") {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js").catch(() => {});
-      });
-    }
   </script>
 
 
