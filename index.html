@@ -6,32 +6,33 @@
   <title>Movie Mood</title>
   <style>
     :root {
-      --bg: #070a12;
-      --ink: #f7f8ff;
-      --muted: #a8adbf;
-      --line: rgba(255,255,255,.13);
+      --ink: #f8f8ff;
+      --muted: #9aa1b5;
+      --line: rgba(255, 255, 255, .13);
       --gold: #ffc84d;
       --teal: #42dcc6;
       --blue: #83aaff;
-      --shadow: 0 24px 80px rgba(0,0,0,.42);
+      --shadow: 0 24px 80px rgba(0, 0, 0, .42);
       color-scheme: dark;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at 12% 5%, rgba(66,220,198,.17), transparent 30%),
-        radial-gradient(circle at 82% 10%, rgba(255,95,117,.14), transparent 30%),
+        radial-gradient(circle at 12% 5%, rgba(66, 220, 198, .17), transparent 30%),
+        radial-gradient(circle at 82% 10%, rgba(255, 95, 117, .14), transparent 30%),
         linear-gradient(145deg, #111322 0%, #080b14 44%, #05070d 100%);
       overflow-x: hidden;
     }
 
     button, input, textarea, select { font: inherit; }
     button { border: 0; color: inherit; cursor: pointer; }
+    svg { width: 22px; height: 22px; flex: 0 0 auto; }
 
     .app {
       width: min(100%, 460px);
@@ -46,7 +47,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 18px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     h1 {
@@ -72,7 +73,7 @@
       color: #111322;
       font-weight: 900;
       background: linear-gradient(145deg, #a3e7ff, #ff8092);
-      box-shadow: 0 10px 28px rgba(255,95,117,.22);
+      box-shadow: 0 10px 28px rgba(255, 95, 117, .22);
     }
 
     .search {
@@ -85,8 +86,17 @@
       margin-bottom: 28px;
       border: 1px solid var(--line);
       border-radius: 24px;
-      background: rgba(32,34,53,.72);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      background: rgba(32, 34, 53, .72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+      overflow: hidden;
+    }
+
+    .search-icon {
+      width: 24px !important;
+      height: 24px !important;
+      max-width: 24px;
+      max-height: 24px;
+      display: block;
     }
 
     .search input {
@@ -111,6 +121,113 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
+    .home-stage {
+      --drag: 0;
+      min-height: 648px;
+      padding-top: 12px;
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .deck-zone {
+      height: 455px;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .movie-card {
+      width: min(72vw, 292px);
+      aspect-ratio: 2 / 3;
+      position: absolute;
+      overflow: hidden;
+      border-radius: 24px;
+      background: #151927;
+      box-shadow: var(--shadow);
+      transform-origin: center;
+      transition: transform .38s cubic-bezier(.2, .9, .2, 1), opacity .38s ease, filter .38s ease;
+      will-change: transform, opacity, filter;
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .movie-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 56%, rgba(0, 0, 0, .72) 100%);
+    }
+
+    .movie-card.is-active {
+      z-index: 5;
+      cursor: grab;
+    }
+
+    .movie-card.is-left,
+    .movie-card.is-right {
+      z-index: 3;
+      opacity: .46;
+      filter: blur(2.5px) saturate(.62) brightness(.62);
+    }
+
+    .rating-pill {
+      position: absolute;
+      z-index: 2;
+      left: 16px;
+      bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(10, 12, 20, .68);
+      backdrop-filter: blur(10px);
+      font-weight: 850;
+      font-size: 14px;
+    }
+
+    .movie-info {
+      width: min(78vw, 330px);
+      margin: 10px auto 0;
+      text-align: center;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+
+    .movie-info.is-changing {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .movie-info h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .movie-info .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .movie-info p {
+      margin: 0;
+      color: rgba(255, 255, 255, .58);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
     .section-head {
       display: flex;
       align-items: end;
@@ -119,120 +236,20 @@
       margin-bottom: 18px;
     }
 
-    .section-head h2 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-    .section-head span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .deck-zone {
-      height: 535px;
-      position: relative;
-      display: grid;
-      place-items: center;
-      touch-action: pan-y;
-      user-select: none;
-    }
-
-    .movie-card {
-      width: min(68vw, 292px);
-      aspect-ratio: 2 / 3;
-      position: absolute;
-      overflow: hidden;
-      border-radius: 24px;
-      background: #151927;
-      box-shadow: var(--shadow);
-      transform-origin: center;
-      transition: transform .32s ease, opacity .32s ease, filter .32s ease;
-    }
-
-    .movie-card img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .movie-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 47%, rgba(0,0,0,.82) 100%);
-    }
-
-    .movie-card.is-active {
-      z-index: 5;
-      cursor: grab;
-    }
-
-    .rating-pill {
-      position: absolute;
-      z-index: 2;
-      left: 16px;
-      bottom: 96px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(10,12,20,.68);
-      backdrop-filter: blur(10px);
-      font-weight: 850;
-      font-size: 14px;
-    }
-
-    .title-strip {
-      position: absolute;
-      z-index: 2;
-      left: 16px;
-      right: 16px;
-      bottom: 20px;
-    }
-
-    .title-strip h3 {
-      margin: 0 0 8px;
-      font-size: 22px;
-      line-height: 1.08;
-    }
-
-    .title-strip p {
-      margin: 0;
-      color: rgba(255,255,255,.76);
-      font-size: 14px;
-    }
-
-    .tap-hint {
-      position: absolute;
-      bottom: 20px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-    }
+    .section-head h2 { margin: 0; font-size: 24px; }
+    .section-head span { color: var(--muted); font-size: 13px; }
 
     .primary, .ghost, .chip, .admin-toggle {
       min-height: 46px;
       border-radius: 999px;
       padding: 0 18px;
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.1);
+      background: rgba(255, 255, 255, .1);
       backdrop-filter: blur(12px);
     }
 
-    .primary {
-      color: #121522;
-      background: #f8f9ff;
-      font-weight: 850;
-    }
-
-    .ghost {
-      color: var(--ink);
-      background: rgba(255,255,255,.08);
-      font-weight: 750;
-    }
+    .primary { color: #121522; background: #f8f9ff; font-weight: 850; }
+    .ghost { color: var(--ink); background: rgba(255, 255, 255, .08); font-weight: 750; }
 
     .list-grid { display: grid; gap: 14px; }
 
@@ -245,124 +262,29 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       text-align: left;
-      background: rgba(255,255,255,.07);
+      background: rgba(255, 255, 255, .07);
     }
 
-    .row-card img {
-      width: 76px;
-      height: 108px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
+    .row-card img { width: 76px; height: 108px; object-fit: cover; border-radius: 8px; }
+    .row-card h3 { margin: 0 0 7px; font-size: 17px; }
+    .row-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .score { display: inline-flex; gap: 5px; margin-top: 9px; color: var(--gold); font-weight: 850; font-size: 14px; }
 
-    .row-card h3 {
-      margin: 0 0 7px;
-      font-size: 17px;
-    }
-
-    .row-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .score {
-      display: inline-flex;
-      gap: 5px;
-      margin-top: 9px;
-      color: var(--gold);
-      font-weight: 850;
-      font-size: 14px;
-    }
-
-    .genre-bar {
-      display: flex;
-      gap: 9px;
-      overflow-x: auto;
-      padding: 2px 0 16px;
-      scrollbar-width: none;
-    }
-
+    .genre-bar { display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 16px; scrollbar-width: none; }
     .genre-bar::-webkit-scrollbar { display: none; }
+    .chip { min-height: 38px; color: var(--muted); white-space: nowrap; }
+    .chip.active { color: #071016; background: var(--teal); border-color: transparent; font-weight: 850; }
 
-    .chip {
-      min-height: 38px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
+    .random-stage { min-height: 520px; display: grid; align-content: center; gap: 18px; }
+    .random-poster { width: min(82vw, 330px); margin: 0 auto; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 24px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .random-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .chip.active {
-      color: #071016;
-      background: var(--teal);
-      border-color: transparent;
-      font-weight: 850;
-    }
-
-    .random-stage {
-      min-height: 520px;
-      display: grid;
-      align-content: center;
-      gap: 18px;
-    }
-
-    .random-poster {
-      width: min(82vw, 330px);
-      margin: 0 auto;
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-
-    .random-poster img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .admin-toggle {
-      width: 100%;
-      margin-top: 22px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      color: var(--blue);
-      font-weight: 850;
-    }
-
-    .admin-panel {
-      display: none;
-      margin-top: 18px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(10,13,24,.72);
-    }
-
+    .admin-toggle { width: 100%; margin-top: 22px; display: inline-flex; align-items: center; justify-content: center; color: var(--blue); font-weight: 850; }
+    .admin-panel { display: none; margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(10, 13, 24, .72); }
     .admin-panel.active { display: block; }
-
     .field { display: grid; gap: 7px; margin-bottom: 12px; }
-
-    .field label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .field input, .field textarea, .field select {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      outline: 0;
-      color: var(--ink);
-      background: rgba(255,255,255,.08);
-      padding: 12px;
-    }
-
+    .field label { color: var(--muted); font-size: 12px; font-weight: 750; }
+    .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 8px; outline: 0; color: var(--ink); background: rgba(255, 255, 255, .08); padding: 12px; }
     .field textarea { resize: vertical; min-height: 82px; }
     .admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -394,7 +316,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(5,7,13,.1), rgba(5,7,13,.26) 42%, rgba(5,7,13,.84));
+      background: linear-gradient(180deg, rgba(5, 7, 13, .1), rgba(5, 7, 13, .26) 42%, rgba(5, 7, 13, .84));
     }
 
     .detail-top {
@@ -412,8 +334,8 @@
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,.18);
-      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255, 255, 255, .18);
+      border: 1px solid rgba(255, 255, 255, .2);
       backdrop-filter: blur(12px);
     }
 
@@ -424,54 +346,18 @@
       z-index: 1;
       padding: 24px;
       border-radius: 24px;
-      background: rgba(29,24,23,.58);
-      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(29, 24, 23, .58);
+      border: 1px solid rgba(255, 255, 255, .16);
       backdrop-filter: blur(22px);
       box-shadow: var(--shadow);
     }
 
-    .detail-sheet h2 {
-      margin: 0 0 8px;
-      font-size: 34px;
-      line-height: 1;
-    }
-
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-      color: rgba(255,255,255,.82);
-      font-size: 14px;
-    }
-
-    .description {
-      margin: 0 0 18px;
-      color: rgba(255,255,255,.84);
-      line-height: 1.5;
-      font-size: 15px;
-    }
-
-    .reviews {
-      display: grid;
-      gap: 10px;
-      margin: 18px 0;
-    }
-
-    .review {
-      padding: 12px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.09);
-      color: rgba(255,255,255,.86);
-      font-size: 13px;
-      line-height: 1.42;
-    }
-
-    .detail-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .detail-sheet h2 { margin: 0 0 8px; font-size: 34px; line-height: 1; }
+    .detail-sheet .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; color: rgba(255, 255, 255, .82); font-size: 14px; }
+    .description { margin: 0 0 18px; color: rgba(255, 255, 255, .84); line-height: 1.5; font-size: 15px; }
+    .reviews { display: grid; gap: 10px; margin: 18px 0; }
+    .review { padding: 12px; border-radius: 8px; background: rgba(255, 255, 255, .09); color: rgba(255, 255, 255, .86); font-size: 13px; line-height: 1.42; }
+    .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .bottom-nav {
       position: fixed;
@@ -486,9 +372,9 @@
       padding: 9px;
       border: 1px solid var(--line);
       border-radius: 24px;
-      background: rgba(9,12,22,.74);
+      background: rgba(9, 12, 22, .74);
       backdrop-filter: blur(22px);
-      box-shadow: 0 18px 60px rgba(0,0,0,.4);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .4);
     }
 
     .nav-btn {
@@ -504,22 +390,11 @@
       font-weight: 850;
     }
 
-    .nav-btn svg { width: 22px; height: 22px; }
-
-    .nav-btn.active {
-      color: #fff;
-      background: rgba(255,255,255,.1);
-    }
-
-    .empty {
-      color: var(--muted);
-      text-align: center;
-      padding: 50px 16px;
-    }
+    .nav-btn.active { color: #fff; background: rgba(255, 255, 255, .1); }
+    .empty { color: var(--muted); text-align: center; padding: 50px 16px; }
 
     @media (max-width: 380px) {
       .app { padding-inline: 16px; }
-      .deck-zone { height: 500px; }
       .movie-card { width: 74vw; }
       .nav-btn { font-size: 10px; }
       .detail-sheet { padding: 20px; }
@@ -537,17 +412,16 @@
     </header>
 
     <label class="search">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <input id="searchInput" type="search" placeholder="Поиск фильма">
       <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
     </label>
 
     <section id="home" class="screen active">
-      <div class="section-head">
-        <h2>Главная</h2>
-        <span>Свайпайте постеры</span>
+      <div id="homeStage" class="home-stage">
+        <div id="deck" class="deck-zone" aria-label="Свайп фильмов"></div>
+        <div id="movieInfo" class="movie-info"></div>
       </div>
-      <div id="deck" class="deck-zone" aria-label="Свайп фильмов"></div>
     </section>
 
     <section id="recommended" class="screen">
@@ -559,26 +433,11 @@
       <button id="adminToggle" class="admin-toggle" type="button">Админ</button>
       <form id="adminPanel" class="admin-panel">
         <h3>Редактор рекомендаций</h3>
-        <div class="field">
-          <label for="apiKey">TMDb API key</label>
-          <input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb">
-        </div>
-        <div class="field">
-          <label for="movieSelect">Фильм</label>
-          <select id="movieSelect"></select>
-        </div>
-        <div class="field">
-          <label for="customTitle">Своя рекомендация</label>
-          <input id="customTitle" placeholder="Название фильма">
-        </div>
-        <div class="field">
-          <label for="customPoster">Ссылка на постер</label>
-          <input id="customPoster" placeholder="https://...">
-        </div>
-        <div class="field">
-          <label for="customNote">Комментарий коллекции</label>
-          <textarea id="customNote" placeholder="Почему стоит посмотреть"></textarea>
-        </div>
+        <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb"></div>
+        <div class="field"><label for="movieSelect">Фильм</label><select id="movieSelect"></select></div>
+        <div class="field"><label for="customTitle">Своя рекомендация</label><input id="customTitle" placeholder="Название фильма"></div>
+        <div class="field"><label for="customPoster">Ссылка на постер</label><input id="customPoster" placeholder="https://..."></div>
+        <div class="field"><label for="customNote">Комментарий коллекции</label><textarea id="customNote" placeholder="Почему стоит посмотреть"></textarea></div>
         <div class="admin-actions">
           <button class="primary" type="button" id="saveRecommendation">В коллекцию</button>
           <button class="ghost" type="button" id="loadTmdb">TMDb</button>
@@ -610,9 +469,7 @@
   <aside id="detail" class="detail" aria-hidden="true">
     <div id="detailHero" class="detail-hero">
       <div class="detail-top">
-        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад">
-          <svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="side-actions">
           <button class="icon-btn" type="button" id="addCurrent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           <button class="icon-btn" type="button" aria-label="Нравится"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
@@ -623,10 +480,7 @@
         <div id="detailMeta" class="meta"></div>
         <p id="detailDescription" class="description"></p>
         <div id="detailReviews" class="reviews"></div>
-        <div class="detail-actions">
-          <button class="primary" type="button">Смотреть</button>
-          <button class="ghost" type="button" id="trailerBtn">Трейлер</button>
-        </div>
+        <div class="detail-actions"><button class="primary" type="button">Смотреть</button><button class="ghost" type="button" id="trailerBtn">Трейлер</button></div>
       </div>
     </div>
   </aside>
@@ -657,10 +511,12 @@
     let currentGenre = "Все";
     let randomMovie = state.movies[0];
     let pointerStart = null;
+    let dragX = 0;
     let dragged = false;
 
     const $ = (selector) => document.querySelector(selector);
     const deck = $("#deck");
+    const homeStage = $("#homeStage");
     const detail = $("#detail");
 
     function loadState() {
@@ -678,10 +534,7 @@
       }
     }
 
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     function poster(movie) { return movie.poster || fallbackPoster; }
     function backdrop(movie) { return movie.backdrop || poster(movie); }
 
@@ -696,31 +549,38 @@
       return list.length ? list : state.movies;
     }
 
+    function wrapIndex(index, total) {
+      return (index + total) % total;
+    }
+
     function renderDeck() {
       const movies = visibleMovies();
       activeIndex = Math.min(activeIndex, movies.length - 1);
       deck.innerHTML = "";
       if (!movies.length) {
         deck.innerHTML = '<p class="empty">Фильмы не найдены</p>';
+        $("#movieInfo").innerHTML = "";
         return;
       }
-      movies.forEach((movie, index) => {
-        const offset = index - activeIndex;
-        if (Math.abs(offset) > 2) return;
+
+      const total = movies.length;
+      const slots = [
+        { role: "left", index: wrapIndex(activeIndex - 1, total), x: -218, scale: .92, rotate: -2 },
+        { role: "active", index: activeIndex, x: 0, scale: 1, rotate: 0 },
+        { role: "right", index: wrapIndex(activeIndex + 1, total), x: 218, scale: .92, rotate: 2 }
+      ];
+
+      slots.forEach((slot) => {
+        const movie = movies[slot.index];
         const card = document.createElement("article");
-        card.className = `movie-card${offset === 0 ? " is-active" : ""}`;
+        card.className = `movie-card is-${slot.role}`;
+        card.dataset.role = slot.role;
+        card.dataset.baseX = slot.x;
+        card.dataset.scale = slot.scale;
+        card.dataset.rotate = slot.rotate;
         card.dataset.id = movie.id;
-        card.style.transform = `translateX(${offset * 78}px) scale(${1 - Math.abs(offset) * .08}) rotate(${offset * 4}deg)`;
-        card.style.opacity = offset === 0 ? "1" : ".42";
-        card.style.filter = offset === 0 ? "none" : "blur(3px) saturate(.55) brightness(.58)";
-        card.innerHTML = `
-          <img src="${poster(movie)}" alt="${movie.title}">
-          <div class="rating-pill">★ ${movie.rating}</div>
-          <div class="title-strip">
-            <h3>${movie.title}</h3>
-            <p>${movie.year} · ${movie.genres.slice(0, 2).join(", ")}</p>
-          </div>`;
-        if (offset === 0) {
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
+        if (slot.role === "active") {
           card.addEventListener("pointerdown", startDrag);
           card.addEventListener("click", () => {
             if (!dragged) openDetail(movie);
@@ -728,45 +588,105 @@
         }
         deck.appendChild(card);
       });
-      const hint = document.createElement("div");
-      hint.className = "tap-hint";
-      hint.textContent = "Нажмите на постер, чтобы открыть описание";
-      deck.appendChild(hint);
+      updateCarousel(0);
+      renderMovieInfo(movies[activeIndex], false);
+    }
+
+    function renderMovieInfo(movie, changing) {
+      const info = $("#movieInfo");
+      info.classList.toggle("is-changing", changing);
+      info.innerHTML = `
+        <h2>${movie.title}</h2>
+        <div class="meta">${movie.year} · ${movie.time} · ★ ${movie.rating}</div>
+        <p>${movie.description}</p>
+      `;
+      if (changing) {
+        requestAnimationFrame(() => info.classList.remove("is-changing"));
+      }
+    }
+
+    function updateCarousel(dx) {
+      const infoOpacity = 1 - Math.min(Math.abs(dx) / 120, .78);
+      const info = $("#movieInfo");
+      info.style.opacity = infoOpacity;
+      info.style.transform = `translateY(${Math.abs(dx) * .03}px)`;
+      deck.querySelectorAll(".movie-card").forEach((card) => {
+        const role = card.dataset.role;
+        const baseX = Number(card.dataset.baseX);
+        const progress = Math.min(Math.abs(dx) / 218, 1);
+        let x = baseX + dx;
+        let scale = Number(card.dataset.scale);
+        let opacity = role === "active" ? 1 : .46;
+        let blur = role === "active" ? 0 : 2.5;
+        let brightness = role === "active" ? 1 : .62;
+
+        if (role === "right" && dx < 0) {
+          scale = .92 + progress * .08;
+          opacity = .46 + progress * .54;
+          blur = 2.5 - progress * 2.5;
+          brightness = .62 + progress * .38;
+        }
+
+        if (role === "left" && dx > 0) {
+          scale = .92 + progress * .08;
+          opacity = .46 + progress * .54;
+          blur = 2.5 - progress * 2.5;
+          brightness = .62 + progress * .38;
+        }
+
+        if (role === "active") {
+          scale = 1 - progress * .08;
+          opacity = 1 - progress * .48;
+          blur = progress * 2.5;
+          brightness = 1 - progress * .28;
+        }
+
+        card.style.transform = `translateX(${x}px) scale(${scale}) rotate(${dx / 22}deg)`;
+        card.style.opacity = opacity;
+        card.style.filter = `blur(${blur}px) saturate(.72) brightness(${brightness})`;
+      });
     }
 
     function moveDeck(step) {
       const movies = visibleMovies();
-      activeIndex = (activeIndex + step + movies.length) % movies.length;
-      renderDeck();
+      $("#movieInfo").classList.add("is-changing");
+      setTimeout(() => {
+        activeIndex = wrapIndex(activeIndex + step, movies.length);
+        dragX = 0;
+        renderDeck();
+      }, 120);
     }
 
     function startDrag(event) {
       pointerStart = { x: event.clientX, y: event.clientY };
       dragged = false;
+      dragX = 0;
       const card = event.currentTarget;
       card.setPointerCapture(event.pointerId);
       card.addEventListener("pointermove", dragCard);
       card.addEventListener("pointerup", endDrag, { once: true });
+      card.addEventListener("pointercancel", endDrag, { once: true });
     }
 
     function dragCard(event) {
       if (!pointerStart) return;
-      const dx = event.clientX - pointerStart.x;
-      if (Math.abs(dx) > 8) dragged = true;
-      const card = event.currentTarget;
-      card.style.transition = "none";
-      card.style.transform = `translateX(${dx}px) rotate(${dx / 14}deg)`;
+      dragX = Math.max(-230, Math.min(230, event.clientX - pointerStart.x));
+      if (Math.abs(dragX) > 8) dragged = true;
+      updateCarousel(dragX);
     }
 
     function endDrag(event) {
       const card = event.currentTarget;
       card.removeEventListener("pointermove", dragCard);
       if (!pointerStart) return;
-      const dx = event.clientX - pointerStart.x;
+      const dx = dragX;
       pointerStart = null;
-      card.style.transition = "";
-      if (Math.abs(dx) > 70) moveDeck(dx > 0 ? -1 : 1);
-      else renderDeck();
+      if (Math.abs(dx) > 82) {
+        moveDeck(dx > 0 ? -1 : 1);
+      } else {
+        dragX = 0;
+        updateCarousel(0);
+      }
       setTimeout(() => { dragged = false; }, 0);
     }
 
@@ -780,10 +700,7 @@
         const card = document.createElement("button");
         card.type = "button";
         card.className = "row-card";
-        card.innerHTML = `
-          <img src="${poster(movie)}" alt="${movie.title}">
-          <span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">★ ${movie.rating}</span></span>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">★ ${movie.rating}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         card.addEventListener("click", () => openDetail(movie));
         container.appendChild(card);
       });
