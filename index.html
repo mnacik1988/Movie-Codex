@@ -1,9 +1,15 @@
 <!doctype html>
-<html lang="ru">
-<head>
+<html lang="ru"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Movie Mood</title>
+  <meta name="theme-color" content="#080b14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Movie Mood">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
   <style>
     :root {
       --ink: #f8f8ff;
@@ -412,29 +418,33 @@
     </header>
 
     <label class="search">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
       <input id="searchInput" type="search" placeholder="Поиск фильма">
-      <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"></path><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></span>
     </label>
 
     <section id="home" class="screen active">
       <div id="homeStage" class="home-stage">
-        <div id="deck" class="deck-zone" aria-label="Свайп фильмов"></div>
-        <div id="movieInfo" class="movie-info"></div>
+        <div id="deck" class="deck-zone" aria-label="Свайп фильмов"><article class="movie-card is-left" data-role="left" data-base-x="-218" data-scale="0.92" data-rotate="-2" data-id="finch" style="transform: translateX(-218px) scale(0.92) rotate(0deg); opacity: 0.46; filter: blur(2.5px) saturate(0.72) brightness(0.62);"><img src="https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg" alt="Finch"><div class="rating-pill">★ 6.9</div></article><article class="movie-card is-active" data-role="active" data-base-x="0" data-scale="1" data-rotate="0" data-id="dune-2" style="transform: translateX(0px) scale(1) rotate(0deg); opacity: 1; filter: blur(0px) saturate(0.72) brightness(1);"><img src="https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg" alt="Дюна: Часть вторая"><div class="rating-pill">★ 8.5</div></article><article class="movie-card is-right" data-role="right" data-base-x="218" data-scale="0.92" data-rotate="2" data-id="godzilla" style="transform: translateX(218px) scale(0.92) rotate(0deg); opacity: 0.46; filter: blur(2.5px) saturate(0.72) brightness(0.62);"><img src="https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg" alt="Monarch: Legacy of Monsters"><div class="rating-pill">★ 8.4</div></article></div>
+        <div id="movieInfo" class="movie-info" style="opacity: 1; transform: translateY(0px);">
+        <h2>Дюна: Часть вторая</h2>
+        <div class="meta">2024 · 166 мин · ★ 8.5</div>
+        <p>Пол Атрейдес объединяется с фременами и идет к судьбе, которая может изменить Арракис и всю империю.</p>
+      </div>
       </div>
     </section>
 
     <section id="recommended" class="screen">
       <div class="section-head">
         <h2>Рекомендуемые</h2>
-        <span id="recommendedCount"></span>
+        <span id="recommendedCount">2 фильмов</span>
       </div>
-      <div id="recommendedList" class="list-grid"></div>
+      <div id="recommendedList" class="list-grid"><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg" alt="Дюна: Часть вторая"><span><h3>Дюна: Часть вторая</h3><p>Пол Атрейдес объединяется с фременами и идет к судьбе, которая может изменить Арракис и всю империю.</p><span class="score">★ 8.5</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg" alt="Monarch: Legacy of Monsters"><span><h3>Monarch: Legacy of Monsters</h3><p>После атаки Годзиллы семья раскрывает связь с тайной организацией Monarch и наследием огромных монстров.</p><span class="score">★ 8.4</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
       <button id="adminToggle" class="admin-toggle" type="button">Админ</button>
       <form id="adminPanel" class="admin-panel">
         <h3>Редактор рекомендаций</h3>
         <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb"></div>
-        <div class="field"><label for="movieSelect">Фильм</label><select id="movieSelect"></select></div>
+        <div class="field"><label for="movieSelect">Фильм</label><select id="movieSelect"><option value="finch">Finch</option><option value="dune-2">Дюна: Часть вторая</option><option value="godzilla">Monarch: Legacy of Monsters</option><option value="poor-things">Бедные-несчастные</option><option value="oppenheimer">Оппенгеймер</option></select></div>
         <div class="field"><label for="customTitle">Своя рекомендация</label><input id="customTitle" placeholder="Название фильма"></div>
         <div class="field"><label for="customPoster">Ссылка на постер</label><input id="customPoster" placeholder="https://..."></div>
         <div class="field"><label for="customNote">Комментарий коллекции</label><textarea id="customNote" placeholder="Почему стоит посмотреть"></textarea></div>
@@ -450,8 +460,8 @@
         <h2>По жанру</h2>
         <span>Выберите настроение</span>
       </div>
-      <div id="genreBar" class="genre-bar"></div>
-      <div id="genreList" class="list-grid"></div>
+      <div id="genreBar" class="genre-bar"><button class="chip active" type="button" data-genre="Все">Все</button><button class="chip" type="button" data-genre="Приключения">Приключения</button><button class="chip" type="button" data-genre="Драма">Драма</button><button class="chip" type="button" data-genre="Sci-Fi">Sci-Fi</button><button class="chip" type="button" data-genre="Фантастика">Фантастика</button><button class="chip" type="button" data-genre="Экшен">Экшен</button><button class="chip" type="button" data-genre="Комедия">Комедия</button><button class="chip" type="button" data-genre="Фэнтези">Фэнтези</button><button class="chip" type="button" data-genre="История">История</button><button class="chip" type="button" data-genre="Биография">Биография</button></div>
+      <div id="genreList" class="list-grid"><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg" alt="Finch"><span><h3>Finch</h3><p>Робот, созданный инженером после глобальной катастрофы, учится заботиться о собаке своего создателя и понимать, что делает людей людьми.</p><span class="score">★ 6.9</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg" alt="Дюна: Часть вторая"><span><h3>Дюна: Часть вторая</h3><p>Пол Атрейдес объединяется с фременами и идет к судьбе, которая может изменить Арракис и всю империю.</p><span class="score">★ 8.5</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg" alt="Monarch: Legacy of Monsters"><span><h3>Monarch: Legacy of Monsters</h3><p>После атаки Годзиллы семья раскрывает связь с тайной организацией Monarch и наследием огромных монстров.</p><span class="score">★ 8.4</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg" alt="Бедные-несчастные"><span><h3>Бедные-несчастные</h3><p>Белла Бакстер открывает мир заново, превращая странное путешествие в историю свободы, любопытства и взросления.</p><span class="score">★ 7.8</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><button type="button" class="row-card"><img src="https://image.tmdb.org/t/p/w780/ptpr0kGAckfQkJeJIt8st5dglvd.jpg" alt="Оппенгеймер"><span><h3>Оппенгеймер</h3><p>История ученого, который возглавил Манхэттенский проект и столкнулся с последствиями собственного открытия.</p><span class="score">★ 8.1</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></div>
     </section>
 
     <section id="random" class="screen">
@@ -460,36 +470,36 @@
         <span>Один тап</span>
       </div>
       <div class="random-stage">
-        <div id="randomPoster" class="random-poster"></div>
+        <div id="randomPoster" class="random-poster"><img src="https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg" alt="Finch"></div>
         <button id="randomBtn" class="primary" type="button">Подобрать фильм</button>
       </div>
     </section>
   </main>
 
   <aside id="detail" class="detail" aria-hidden="true">
-    <div id="detailHero" class="detail-hero">
+    <div id="detailHero" class="detail-hero" style="background-image: url(&quot;https://image.tmdb.org/t/p/w1280/bQS43HSLZzMjZkcHJz4fGc7fNdz.jpg&quot;);">
       <div class="detail-top">
-        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
         <div class="side-actions">
-          <button class="icon-btn" type="button" id="addCurrent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button class="icon-btn" type="button" aria-label="Нравится"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+          <button class="icon-btn" type="button" id="addCurrent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button>
+          <button class="icon-btn" type="button" aria-label="Нравится"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg></button>
         </div>
       </div>
       <div class="detail-sheet">
-        <h2 id="detailTitle"></h2>
-        <div id="detailMeta" class="meta"></div>
-        <p id="detailDescription" class="description"></p>
-        <div id="detailReviews" class="reviews"></div>
+        <h2 id="detailTitle">Бедные-несчастные</h2>
+        <div id="detailMeta" class="meta"><span>★ 7.8</span><span>2023</span><span>142 мин</span><span>HD</span><span>Комедия, Драма, Фэнтези</span></div>
+        <p id="detailDescription" class="description">Белла Бакстер открывает мир заново, превращая странное путешествие в историю свободы, любопытства и взросления.</p>
+        <div id="detailReviews" class="reviews"><div class="review"><b>Оля:</b> Очень необычно, визуально роскошно, местами смешно до неловкости.</div><div class="review"><b>Денис:</b> Фильм не для всех, но если зайдет, запомнится надолго.</div></div>
         <div class="detail-actions"><button class="primary" type="button">Смотреть</button><button class="ghost" type="button" id="trailerBtn">Трейлер</button></div>
       </div>
     </div>
   </aside>
 
   <nav class="bottom-nav" aria-label="Главное меню">
-    <button class="nav-btn active" type="button" data-tab="home" aria-label="Главная"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V21h-6v-5.5H9V21H3v-9.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Главная</button>
-    <button class="nav-btn" type="button" data-tab="recommended" aria-label="Рекомендуемые"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5h10a2 2 0 0 1 2 2v14l-7-4-7 4V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Рекоменд.</button>
-    <button class="nav-btn" type="button" data-tab="genres" aria-label="По жанру"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Жанры</button>
-    <button class="nav-btn" type="button" data-tab="random" aria-label="Рандомный фильм"><svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M21 3l-7.5 7.5M4 20l6.5-6.5M15 20h6v-6M21 20l-7.5-7.5M4 4l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Рандом</button>
+    <button class="nav-btn active" type="button" data-tab="home" aria-label="Главная"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V21h-6v-5.5H9V21H3v-9.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg>Главная</button>
+    <button class="nav-btn" type="button" data-tab="recommended" aria-label="Рекомендуемые"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5h10a2 2 0 0 1 2 2v14l-7-4-7 4V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg>Рекоменд.</button>
+    <button class="nav-btn" type="button" data-tab="genres" aria-label="По жанру"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>Жанры</button>
+    <button class="nav-btn" type="button" data-tab="random" aria-label="Рандомный фильм"><svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M21 3l-7.5 7.5M4 20l6.5-6.5M15 20h6v-6M21 20l-7.5-7.5M4 4l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Рандом</button>
   </nav>
 
   <script>
@@ -868,6 +878,13 @@
     });
 
     renderAll();
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js").catch(() => {});
+      });
+    }
   </script>
-</body>
-</html>
+
+
+</body></html>
