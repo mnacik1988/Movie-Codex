@@ -727,6 +727,8 @@
     const imageCache = new Map();
     let editingId = null;
     let currentDetailMovie = null;
+    let lastDeckKey = "";
+    let searchTimer = null;
 
     const $ = (selector) => document.querySelector(selector);
     const deck = $("#deck");
@@ -798,6 +800,24 @@
       return list.length ? list : moviePool("home");
     }
 
+    function deckKey(movies) {
+      return movies.map((movie) => movie.id).join("|");
+    }
+
+    function applySearch() {
+      const movies = visibleMovies();
+      const nextKey = deckKey(movies);
+      if (nextKey === lastDeckKey) return;
+      lastDeckKey = nextKey;
+      activeIndex = 0;
+      renderDeck(movies);
+    }
+
+    function scheduleSearch() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applySearch, 180);
+    }
+
     function wrapIndex(index, total) {
       return (index + total) % total;
     }
@@ -835,8 +855,9 @@
       };
     }
 
-    function renderDeck() {
-      const movies = visibleMovies();
+    function renderDeck(sourceMovies = visibleMovies()) {
+      const movies = sourceMovies;
+      lastDeckKey = deckKey(movies);
       activeIndex = Math.min(activeIndex, Math.max(0, movies.length - 1));
       const fragment = document.createDocumentFragment();
       if (!movies.length) {
@@ -1290,7 +1311,7 @@
     $("#trailerModal").addEventListener("click", (event) => {
       if (event.target.id === "trailerModal") closeTrailer();
     });
-    $("#searchInput").addEventListener("input", () => { activeIndex = 0; renderDeck(); });
+    $("#searchInput").addEventListener("input", scheduleSearch);
     $("#adminEntry").addEventListener("click", openAdminGate);
     $("#closeLogin").addEventListener("click", () => closeModal("#loginModal"));
     $("#closeAdmin").addEventListener("click", () => closeModal("#adminModal"));
@@ -1337,7 +1358,7 @@
       if (!searchInput.value.includes("@")) return;
       searchInput.value = "";
       activeIndex = 0;
-      renderDeck();
+      applySearch();
     }
     window.addEventListener("pageshow", clearAutofilledSearch);
     window.addEventListener("load", clearAutofilledSearch);
@@ -1350,7 +1371,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=6").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=7").catch(() => {});
       });
     }
   </script>
