@@ -770,7 +770,8 @@
 
       const total = movies.length;
       const used = new Set();
-      [-2, -1, 0, 1, 2].forEach((distance) => {
+      const distances = total === 1 ? [0] : total === 2 ? [-1, 0] : total === 3 ? [-1, 0, 1] : [-2, -1, 0, 1, 2];
+      distances.forEach((distance) => {
         const index = wrapIndex(activeIndex + distance, total);
         if (used.has(index)) return;
         used.add(index);
@@ -842,6 +843,12 @@
       if (isAnimating) return;
       const movies = visibleMovies();
       if (movies.length < 2) return;
+      if (movies.length < 4) {
+        activeIndex = wrapIndex(activeIndex + step, movies.length);
+        dragX = 0;
+        renderDeck();
+        return;
+      }
       isAnimating = true;
       const finishDx = step > 0 ? -258 : 258;
       const info = $("#movieInfo");
