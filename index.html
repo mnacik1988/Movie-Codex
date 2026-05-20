@@ -781,12 +781,8 @@
         card.dataset.distance = distance;
         card.dataset.id = movie.id;
         card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
-        if (distance === 0) {
-          card.addEventListener("pointerdown", startDrag);
-          card.addEventListener("click", () => {
-            if (!dragged && !isAnimating) openDetail(movie);
-          });
-        }
+        card.addEventListener("pointerdown", startDrag);
+        card.addEventListener("click", openActiveCard);
         fragment.appendChild(card);
       });
       deck.replaceChildren(fragment);
@@ -802,6 +798,24 @@
         <div class="meta">${movie.year} · ${movie.time} · ★ ${movie.rating}</div>
         <p>${movie.description}</p>
       `;
+    }
+
+    function setCardMovie(card, movie) {
+      card.dataset.id = movie.id;
+      const image = card.querySelector("img");
+      const rating = card.querySelector(".rating-pill");
+      if (image && image.src !== poster(movie)) {
+        image.src = poster(movie);
+        image.alt = movie.title;
+      }
+      if (rating) rating.textContent = `★ ${movie.rating}`;
+    }
+
+    function openActiveCard(event) {
+      const card = event.currentTarget;
+      if (dragged || isAnimating || Number(card.dataset.distance) !== 0) return;
+      const movie = visibleMovies().find((item) => item.id === card.dataset.id);
+      if (movie) openDetail(movie);
     }
 
     function updateCarousel(dx) {
@@ -840,25 +854,36 @@
         const nextIndex = wrapIndex(activeIndex + step, movies.length);
         const pendingImages = [-2, -1, 0, 1, 2].map((distance) => preloadImage(poster(movies[wrapIndex(nextIndex + distance, movies.length)])));
         Promise.all(pendingImages).then(() => {
-        activeIndex = nextIndex;
-        dragX = 0;
-        deck.classList.add("is-resetting");
-        renderDeck();
-        const newInfo = $("#movieInfo");
-        newInfo.style.opacity = 0;
-        newInfo.style.transform = "translateY(8px)";
-        requestAnimationFrame(() => deck.classList.remove("is-resetting"));
-        requestAnimationFrame(() => {
-          newInfo.style.opacity = 1;
-          newInfo.style.transform = "translateY(0)";
-          isAnimating = false;
-        });
+          activeIndex = nextIndex;
+          dragX = 0;
+          deck.classList.add("is-resetting");
+          deck.querySelectorAll(".movie-card").forEach((card) => {
+            let distance = Number(card.dataset.distance) - step;
+            if (distance < -2) distance = 2;
+            if (distance > 2) distance = -2;
+            const movie = movies[wrapIndex(activeIndex + distance, movies.length)];
+            card.dataset.distance = distance;
+            card.classList.toggle("is-active", distance === 0);
+            setCardMovie(card, movie);
+          });
+          updateCarousel(0);
+          renderMovieInfo(movies[activeIndex]);
+          const newInfo = $("#movieInfo");
+          newInfo.style.opacity = 0;
+          newInfo.style.transform = "translateY(8px)";
+          requestAnimationFrame(() => deck.classList.remove("is-resetting"));
+          requestAnimationFrame(() => {
+            newInfo.style.opacity = 1;
+            newInfo.style.transform = "translateY(0)";
+            isAnimating = false;
+          });
         });
       }, 520);
     }
 
     function startDrag(event) {
       if (isAnimating) return;
+      if (Number(event.currentTarget.dataset.distance) !== 0) return;
       pointerStart = { x: event.clientX, y: event.clientY };
       dragged = false;
       dragX = 0;
