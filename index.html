@@ -146,6 +146,9 @@
       width: 100vw;
       margin-left: calc(50% - 50vw);
       overflow: visible;
+      isolation: isolate;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
 
     .movie-card {
@@ -159,6 +162,10 @@
       transform-origin: center;
       transition: transform .68s cubic-bezier(.18, .9, .16, 1), opacity .68s ease, filter .68s ease;
       will-change: transform, opacity, filter;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
 
     .deck-zone.is-resetting .movie-card {
@@ -176,6 +183,10 @@
       display: block;
       object-fit: cover;
       pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
 
     .movie-card:not(.is-active) {
@@ -637,6 +648,7 @@
     let dragX = 0;
     let dragged = false;
     let isAnimating = false;
+    const imageCache = new Map();
     let editingId = null;
 
     const $ = (selector) => document.querySelector(selector);
@@ -669,6 +681,28 @@
 
     function poster(movie) { return movie.poster || fallbackPoster; }
     function backdrop(movie) { return movie.backdrop || poster(movie); }
+    function preloadImage(src) {
+      if (!src) return Promise.resolve();
+      if (imageCache.has(src)) return imageCache.get(src);
+      const image = new Image();
+      image.decoding = "async";
+      image.loading = "eager";
+      image.src = src;
+      const ready = image.decode ? image.decode().catch(() => {}) : new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+      });
+      imageCache.set(src, ready);
+      return ready;
+    }
+
+    function warmMovieImages(list) {
+      list.forEach((movie) => {
+        preloadImage(poster(movie));
+        preloadImage(backdrop(movie));
+      });
+    }
+
     function isPlaced(movie, place) { return movie.placements?.[place] !== false; }
 
     function moviePool(place) {
@@ -727,7 +761,7 @@
     function renderDeck() {
       const movies = visibleMovies();
       activeIndex = Math.min(activeIndex, Math.max(0, movies.length - 1));
-      deck.innerHTML = "";
+      const fragment = document.createDocumentFragment();
       if (!movies.length) {
         deck.innerHTML = '<p class="empty">Фильмы не найдены</p>';
         $("#movieInfo").innerHTML = "";
@@ -741,6 +775,7 @@
         if (used.has(index)) return;
         used.add(index);
         const movie = movies[index];
+        preloadImage(poster(movie));
         const card = document.createElement("article");
         card.className = `movie-card${distance === 0 ? " is-active" : ""}`;
         card.dataset.distance = distance;
@@ -752,8 +787,9 @@
             if (!dragged && !isAnimating) openDetail(movie);
           });
         }
-        deck.appendChild(card);
+        fragment.appendChild(card);
       });
+      deck.replaceChildren(fragment);
 
       updateCarousel(0);
       renderMovieInfo(movies[activeIndex]);
@@ -795,12 +831,16 @@
       isAnimating = true;
       const finishDx = step > 0 ? -258 : 258;
       const info = $("#movieInfo");
+      warmMovieImages(movies);
       homeStage.classList.remove("is-dragging");
       updateCarousel(finishDx);
       info.style.opacity = 0;
       info.style.transform = "translateY(8px)";
       setTimeout(() => {
-        activeIndex = wrapIndex(activeIndex + step, movies.length);
+        const nextIndex = wrapIndex(activeIndex + step, movies.length);
+        const pendingImages = [-2, -1, 0, 1, 2].map((distance) => preloadImage(poster(movies[wrapIndex(nextIndex + distance, movies.length)])));
+        Promise.all(pendingImages).then(() => {
+        activeIndex = nextIndex;
         dragX = 0;
         deck.classList.add("is-resetting");
         renderDeck();
@@ -812,6 +852,7 @@
           newInfo.style.opacity = 1;
           newInfo.style.transform = "translateY(0)";
           isAnimating = false;
+        });
         });
       }, 520);
     }
@@ -1115,6 +1156,7 @@
       if (currentTab === "home" && event.key === "ArrowLeft") moveDeck(-1);
     });
 
+    warmMovieImages(state.movies);
     renderAll();
 
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
