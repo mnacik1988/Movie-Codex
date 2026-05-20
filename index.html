@@ -493,28 +493,28 @@
     <header class="topbar">
       <div class="hello">
         <h1>Movie Mood</h1>
-        <p>РџРѕРґР±РµСЂРµРј С„РёР»СЊРј РЅР° РІРµС‡РµСЂ</p>
+        <p>Подберем фильм на вечер</p>
       </div>
-      <button id="adminEntry" class="avatar" type="button" aria-label="РђРґРјРёРЅ">M</button>
+      <button id="adminEntry" class="avatar" type="button" aria-label="Админ">M</button>
     </header>
 
     <form class="search" autocomplete="off" action="javascript:void(0)" role="search">
       <input type="text" name="email" autocomplete="username" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input id="searchInput" type="text" name="film-query-field" placeholder="РџРѕРёСЃРє С„РёР»СЊРјР°" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
+      <input id="searchInput" type="text" name="film-query-field" placeholder="Поиск фильма" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
       <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
     </form>
 
     <section id="home" class="screen active">
       <div id="homeStage" class="home-stage">
-        <div id="deck" class="deck-zone" aria-label="РЎРІР°Р№Рї С„РёР»СЊРјРѕРІ"></div>
+        <div id="deck" class="deck-zone" aria-label="Свайп фильмов"></div>
         <div id="movieInfo" class="movie-info"></div>
       </div>
     </section>
 
     <section id="recommended" class="screen">
       <div class="section-head">
-        <h2>Р РµРєРѕРјРµРЅРґСѓРµРјС‹Рµ</h2>
+        <h2>Рекомендуемые</h2>
         <span id="recommendedCount"></span>
       </div>
       <div id="recommendedList" class="list-grid"></div>
@@ -522,8 +522,8 @@
 
     <section id="genres" class="screen">
       <div class="section-head">
-        <h2>РџРѕ Р¶Р°РЅСЂСѓ</h2>
-        <span>Р’С‹Р±РµСЂРёС‚Рµ РЅР°СЃС‚СЂРѕРµРЅРёРµ</span>
+        <h2>По жанру</h2>
+        <span>Выберите настроение</span>
       </div>
       <div class="genre-shell">
         <div id="genreBar" class="genre-bar"></div>
@@ -533,12 +533,12 @@
 
     <section id="random" class="screen">
       <div class="section-head">
-        <h2>Р Р°РЅРґРѕРјРЅС‹Р№ С„РёР»СЊРј</h2>
-        <span>РћРґРёРЅ С‚Р°Рї</span>
+        <h2>Рандомный фильм</h2>
+        <span>Один тап</span>
       </div>
       <div class="random-stage">
         <div id="randomPoster" class="random-poster"></div>
-        <button id="randomBtn" class="primary" type="button">РџРѕРґРѕР±СЂР°С‚СЊ С„РёР»СЊРј</button>
+        <button id="randomBtn" class="primary" type="button">Подобрать фильм</button>
       </div>
     </section>
   </main>
@@ -546,10 +546,10 @@
   <aside id="detail" class="detail" aria-hidden="true">
     <div id="detailHero" class="detail-hero">
       <div class="detail-top">
-        <button id="closeDetail" class="icon-btn" type="button" aria-label="РќР°Р·Р°Рґ"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="side-actions">
-          <button class="icon-btn" type="button" id="addCurrent" aria-label="Р”РѕР±Р°РІРёС‚СЊ"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button class="icon-btn" type="button" aria-label="РќСЂР°РІРёС‚СЃСЏ"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+          <button class="icon-btn" type="button" id="addCurrent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button class="icon-btn" type="button" aria-label="Нравится"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
         </div>
       </div>
       <div class="detail-sheet">
@@ -557,7 +557,7 @@
         <div id="detailMeta" class="meta"></div>
         <p id="detailDescription" class="description"></p>
         <div id="detailReviews" class="reviews"></div>
-        <div class="detail-actions"><button class="primary" type="button">РЎРјРѕС‚СЂРµС‚СЊ</button><button class="ghost" type="button" id="trailerBtn">РўСЂРµР№Р»РµСЂ</button></div>
+        <div class="detail-actions"><button class="primary" type="button" id="trailerBtn">Смотреть трейлер</button></div>
       </div>
     </div>
   </aside>
@@ -565,64 +565,64 @@
   <aside id="loginModal" class="modal" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>Р’С…РѕРґ РІ Р°РґРјРёРЅ</h2>
-        <button id="closeLogin" class="icon-btn" type="button" aria-label="Р—Р°РєСЂС‹С‚СЊ">Г—</button>
+        <h2>Вход в админ</h2>
+        <button id="closeLogin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
       </div>
       <div class="field">
-        <label for="adminPassword">РџР°СЂРѕР»СЊ</label>
-        <input id="adminPassword" type="password" placeholder="Р’РІРµРґРёС‚Рµ РїР°СЂРѕР»СЊ">
+        <label for="adminPassword">Пароль</label>
+        <input id="adminPassword" type="password" placeholder="Введите пароль">
       </div>
-      <button id="loginBtn" class="primary" type="button">Р’РѕР№С‚Рё</button>
+      <button id="loginBtn" class="primary" type="button">Войти</button>
     </div>
   </aside>
 
   <aside id="adminModal" class="modal" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-head">
-        <h2>РђРґРјРёРЅ-РїР°РЅРµР»СЊ</h2>
-        <button id="closeAdmin" class="icon-btn" type="button" aria-label="Р—Р°РєСЂС‹С‚СЊ">Г—</button>
+        <h2>Админ-панель</h2>
+        <button id="closeAdmin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
       </div>
       <div class="field">
-        <label for="adminMovieSelect">Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ С„РёР»СЊРј</label>
+        <label for="adminMovieSelect">Редактировать фильм</label>
         <select id="adminMovieSelect"></select>
       </div>
       <div class="admin-actions">
-        <button id="newMovieBtn" class="ghost" type="button">РќРѕРІС‹Р№</button>
-        <button id="deleteMovieBtn" class="ghost danger" type="button">РЈРґР°Р»РёС‚СЊ</button>
+        <button id="newMovieBtn" class="ghost" type="button">Новый</button>
+        <button id="deleteMovieBtn" class="ghost danger" type="button">Удалить</button>
       </div>
-      <div class="field"><label for="adminTitle">РќР°Р·РІР°РЅРёРµ</label><input id="adminTitle" placeholder="РќР°Р·РІР°РЅРёРµ С„РёР»СЊРјР°"></div>
-      <div class="field"><label for="adminPoster">РџРѕСЃС‚РµСЂ</label><input id="adminPoster" placeholder="https://..."></div>
-      <div class="field"><label for="adminBackdrop">Р¤РѕРЅ РѕРїРёСЃР°РЅРёСЏ</label><input id="adminBackdrop" placeholder="https://..."></div>
+      <div class="field"><label for="adminTitle">Название</label><input id="adminTitle" placeholder="Название фильма"></div>
+      <div class="field"><label for="adminPoster">Постер</label><input id="adminPoster" placeholder="https://..."></div>
+      <div class="field"><label for="adminBackdrop">Фон описания</label><input id="adminBackdrop" placeholder="https://..."></div>
       <div class="admin-actions">
-        <div class="field"><label for="adminYear">Р“РѕРґ</label><input id="adminYear" type="number" placeholder="2026"></div>
-        <div class="field"><label for="adminTime">Р’СЂРµРјСЏ</label><input id="adminTime" placeholder="120 РјРёРЅ"></div>
+        <div class="field"><label for="adminYear">Год</label><input id="adminYear" type="number" placeholder="2026"></div>
+        <div class="field"><label for="adminTime">Время</label><input id="adminTime" placeholder="120 мин"></div>
       </div>
-      <div class="field"><label for="adminRating">Р—РІРµР·РґС‹</label><input id="adminRating" type="number" min="0" max="10" step="0.1" placeholder="8.0"></div>
-      <div class="field"><label for="adminGenres">Р–Р°РЅСЂС‹ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ</label><input id="adminGenres" placeholder="Р”СЂР°РјР°, Sci-Fi"></div>
-      <div class="field"><label for="adminDescription">РћРїРёСЃР°РЅРёРµ</label><textarea id="adminDescription" placeholder="РљРѕСЂРѕС‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ С„РёР»СЊРјР°"></textarea></div>
-      <div class="field"><label for="adminReviews">РћС‚Р·С‹РІС‹, РєР°Р¶РґС‹Р№ СЃ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё</label><textarea id="adminReviews" placeholder="РђРЅРЅР°: РћС‡РµРЅСЊ РїРѕРЅСЂР°РІРёР»РѕСЃСЊ"></textarea></div>
+      <div class="field"><label for="adminRating">Звезды</label><input id="adminRating" type="number" min="0" max="10" step="0.1" placeholder="8.0"></div>
+      <div class="field"><label for="adminGenres">Жанры через запятую</label><input id="adminGenres" placeholder="Драма, Sci-Fi"></div>
+      <div class="field"><label for="adminDescription">Описание</label><textarea id="adminDescription" placeholder="Короткое описание фильма"></textarea></div>
+      <div class="field"><label for="adminReviews">Отзывы, каждый с новой строки</label><textarea id="adminReviews" placeholder="Анна: Очень понравилось"></textarea></div>
       <div class="field">
-        <label>Р“РґРµ РїРѕРєР°Р·С‹РІР°С‚СЊ</label>
+        <label>Где показывать</label>
         <div class="check-grid">
-          <label><input id="placeHome" type="checkbox"> Р“Р»Р°РІРЅР°СЏ</label>
-          <label><input id="placeRecommended" type="checkbox"> Р РµРєРѕРјРµРЅРґСѓРµРјС‹Рµ</label>
-          <label><input id="placeGenres" type="checkbox"> Р–Р°РЅСЂС‹</label>
-          <label><input id="placeRandom" type="checkbox"> Р Р°РЅРґРѕРј</label>
+          <label><input id="placeHome" type="checkbox"> Главная</label>
+          <label><input id="placeRecommended" type="checkbox"> Рекомендуемые</label>
+          <label><input id="placeGenres" type="checkbox"> Жанры</label>
+          <label><input id="placeRandom" type="checkbox"> Рандом</label>
         </div>
       </div>
-      <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Р’СЃС‚Р°РІСЊС‚Рµ РєР»СЋС‡ TMDb"></div>
+      <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb"></div>
       <div class="admin-actions">
-        <button id="saveMovieBtn" class="primary" type="button">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+        <button id="saveMovieBtn" class="primary" type="button">Сохранить</button>
         <button id="loadTmdb" class="ghost" type="button">TMDb</button>
       </div>
     </div>
   </aside>
 
-  <nav class="bottom-nav" aria-label="Р“Р»Р°РІРЅРѕРµ РјРµРЅСЋ">
-    <button class="nav-btn active" type="button" data-tab="home" aria-label="Р“Р»Р°РІРЅР°СЏ"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V21h-6v-5.5H9V21H3v-9.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Р“Р»Р°РІРЅР°СЏ</button>
-    <button class="nav-btn" type="button" data-tab="recommended" aria-label="Р РµРєРѕРјРµРЅРґСѓРµРјС‹Рµ"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5h10a2 2 0 0 1 2 2v14l-7-4-7 4V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Р РµРєРѕРјРµРЅРґ.</button>
-    <button class="nav-btn" type="button" data-tab="genres" aria-label="РџРѕ Р¶Р°РЅСЂСѓ"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Р–Р°РЅСЂС‹</button>
-    <button class="nav-btn" type="button" data-tab="random" aria-label="Р Р°РЅРґРѕРјРЅС‹Р№ С„РёР»СЊРј"><svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M21 3l-7.5 7.5M4 20l6.5-6.5M15 20h6v-6M21 20l-7.5-7.5M4 4l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Р Р°РЅРґРѕРј</button>
+  <nav class="bottom-nav" aria-label="Главное меню">
+    <button class="nav-btn active" type="button" data-tab="home" aria-label="Главная"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V21h-6v-5.5H9V21H3v-9.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Главная</button>
+    <button class="nav-btn" type="button" data-tab="recommended" aria-label="Рекомендуемые"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5h10a2 2 0 0 1 2 2v14l-7-4-7 4V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Рекоменд.</button>
+    <button class="nav-btn" type="button" data-tab="genres" aria-label="По жанру"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Жанры</button>
+    <button class="nav-btn" type="button" data-tab="random" aria-label="Рандомный фильм"><svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M21 3l-7.5 7.5M4 20l6.5-6.5M15 20h6v-6M21 20l-7.5-7.5M4 4l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Рандом</button>
   </nav>
 
   <script>
@@ -633,17 +633,17 @@
 
     const defaultPlacements = { home: true, recommended: false, genres: true, random: true };
     const defaultMovies = [
-      { id: "finch", title: "Finch", year: 2021, time: "115 РјРёРЅ", rating: 6.9, genres: ["РџСЂРёРєР»СЋС‡РµРЅРёСЏ", "Р”СЂР°РјР°", "Sci-Fi"], poster: "https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/oE6bhqqVFyIECtBzqIuvh6JdaB5.jpg", description: "Р РѕР±РѕС‚, СЃРѕР·РґР°РЅРЅС‹Р№ РёРЅР¶РµРЅРµСЂРѕРј РїРѕСЃР»Рµ РіР»РѕР±Р°Р»СЊРЅРѕР№ РєР°С‚Р°СЃС‚СЂРѕС„С‹, СѓС‡РёС‚СЃСЏ Р·Р°Р±РѕС‚РёС‚СЊСЃСЏ Рѕ СЃРѕР±Р°РєРµ СЃРІРѕРµРіРѕ СЃРѕР·РґР°С‚РµР»СЏ Рё РїРѕРЅРёРјР°С‚СЊ, С‡С‚Рѕ РґРµР»Р°РµС‚ Р»СЋРґРµР№ Р»СЋРґСЊРјРё.", reviews: [{ author: "РСЂРёРЅР°", text: "РЎРїРѕРєРѕР№РЅР°СЏ С„Р°РЅС‚Р°СЃС‚РёРєР° СЃ С‚РµРїР»РѕР№ СЌРјРѕС†РёРµР№. РРґРµР°Р»СЊРЅРѕ РґР»СЏ РІРµС‡РµСЂР° Р±РµР· СЃСѓРµС‚С‹." }, { author: "РњР°РєСЃРёРј", text: "РўРѕРј РҐСЌРЅРєСЃ РІС‹С‚СЏРіРёРІР°РµС‚ РґР°Р¶Рµ С‚РёС€РёРЅСѓ, Р° СЂРѕР±РѕС‚ РЅРµРѕР¶РёРґР°РЅРЅРѕ С‚СЂРѕРіР°С‚РµР»СЊРЅС‹Р№." }], placements: { home: true, recommended: false, genres: true, random: true } },
-      { id: "dune-2", title: "Р”СЋРЅР°: Р§Р°СЃС‚СЊ РІС‚РѕСЂР°СЏ", year: 2024, time: "166 РјРёРЅ", rating: 8.5, genres: ["Р¤Р°РЅС‚Р°СЃС‚РёРєР°", "Р”СЂР°РјР°", "РџСЂРёРєР»СЋС‡РµРЅРёСЏ"], poster: "https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg", description: "РџРѕР» РђС‚СЂРµР№РґРµСЃ РѕР±СЉРµРґРёРЅСЏРµС‚СЃСЏ СЃ С„СЂРµРјРµРЅР°РјРё Рё РёРґРµС‚ Рє СЃСѓРґСЊР±Рµ, РєРѕС‚РѕСЂР°СЏ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊ РђСЂСЂР°РєРёСЃ Рё РІСЃСЋ РёРјРїРµСЂРёСЋ.", reviews: [{ author: "РђСЂС‚РµРј", text: "РњРѕРЅСѓРјРµРЅС‚Р°Р»СЊРЅРѕ, РєСЂР°СЃРёРІРѕ Рё РѕС‡РµРЅСЊ РјРѕС‰РЅРѕ РЅР° Р±РѕР»СЊС€РѕРј СЌРєСЂР°РЅРµ." }, { author: "Р›РµРЅР°", text: "Р’С‚РѕСЂР°СЏ С‡Р°СЃС‚СЊ Р·Р°РјРµС‚РЅРѕ Р±С‹СЃС‚СЂРµРµ РїРµСЂРІРѕР№, Р° РјСѓР·С‹РєР° РґРµСЂР¶РёС‚ РЅР°РїСЂСЏР¶РµРЅРёРµ." }], placements: { home: true, recommended: true, genres: true, random: true } },
-      { id: "godzilla", title: "Monarch: Legacy of Monsters", year: 2023, time: "1 СЃРµР·РѕРЅ", rating: 8.4, genres: ["Sci-Fi", "Р”СЂР°РјР°", "Р­РєС€РµРЅ"], poster: "https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/628Dep6AxEtDxjZoGP78TsOxYbK.jpg", description: "РџРѕСЃР»Рµ Р°С‚Р°РєРё Р“РѕРґР·РёР»Р»С‹ СЃРµРјСЊСЏ СЂР°СЃРєСЂС‹РІР°РµС‚ СЃРІСЏР·СЊ СЃ С‚Р°Р№РЅРѕР№ РѕСЂРіР°РЅРёР·Р°С†РёРµР№ Monarch Рё РЅР°СЃР»РµРґРёРµРј РѕРіСЂРѕРјРЅС‹С… РјРѕРЅСЃС‚СЂРѕРІ.", reviews: [{ author: "РЎРµСЂРіРµР№", text: "РЎРµРјРµР№РЅР°СЏ РґСЂР°РјР° СЂР°Р±РѕС‚Р°РµС‚ Р»СѓС‡С€Рµ, С‡РµРј РѕР¶РёРґР°Р», Р° РјРѕРЅСЃС‚СЂС‹ РїРѕСЏРІР»СЏСЋС‚СЃСЏ РІРѕРІСЂРµРјСЏ." }, { author: "РќРёРєР°", text: "РљСЂР°СЃРёРІРѕ СЃРЅСЏС‚Рѕ, С…РѕСЂРѕС€Рѕ РёРґРµС‚ РєР°Рє СЃРµСЂРёР°Р» РЅР° РЅРµСЃРєРѕР»СЊРєРѕ РІРµС‡РµСЂРѕРІ." }], placements: { home: true, recommended: true, genres: true, random: true } },
-      { id: "poor-things", title: "Р‘РµРґРЅС‹Рµ-РЅРµСЃС‡Р°СЃС‚РЅС‹Рµ", year: 2023, time: "142 РјРёРЅ", rating: 7.8, genres: ["РљРѕРјРµРґРёСЏ", "Р”СЂР°РјР°", "Р¤СЌРЅС‚РµР·Рё"], poster: "https://image.tmdb.org/t/p/w780/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/bQS43HSLZzMjZkcHJz4fGc7fNdz.jpg", description: "Р‘РµР»Р»Р° Р‘Р°РєСЃС‚РµСЂ РѕС‚РєСЂС‹РІР°РµС‚ РјРёСЂ Р·Р°РЅРѕРІРѕ, РїСЂРµРІСЂР°С‰Р°СЏ СЃС‚СЂР°РЅРЅРѕРµ РїСѓС‚РµС€РµСЃС‚РІРёРµ РІ РёСЃС‚РѕСЂРёСЋ СЃРІРѕР±РѕРґС‹, Р»СЋР±РѕРїС‹С‚СЃС‚РІР° Рё РІР·СЂРѕСЃР»РµРЅРёСЏ.", reviews: [{ author: "РћР»СЏ", text: "РћС‡РµРЅСЊ РЅРµРѕР±С‹С‡РЅРѕ, РІРёР·СѓР°Р»СЊРЅРѕ СЂРѕСЃРєРѕС€РЅРѕ, РјРµСЃС‚Р°РјРё СЃРјРµС€РЅРѕ РґРѕ РЅРµР»РѕРІРєРѕСЃС‚Рё." }, { author: "Р”РµРЅРёСЃ", text: "Р¤РёР»СЊРј РЅРµ РґР»СЏ РІСЃРµС…, РЅРѕ РµСЃР»Рё Р·Р°Р№РґРµС‚, Р·Р°РїРѕРјРЅРёС‚СЃСЏ РЅР°РґРѕР»РіРѕ." }], placements: { home: true, recommended: false, genres: true, random: true } },
-      { id: "oppenheimer", title: "РћРїРїРµРЅРіРµР№РјРµСЂ", year: 2023, time: "181 РјРёРЅ", rating: 8.1, genres: ["РСЃС‚РѕСЂРёСЏ", "Р”СЂР°РјР°", "Р‘РёРѕРіСЂР°С„РёСЏ"], poster: "https://image.tmdb.org/t/p/w780/ptpr0kGAckfQkJeJIt8st5dglvd.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg", description: "РСЃС‚РѕСЂРёСЏ СѓС‡РµРЅРѕРіРѕ, РєРѕС‚РѕСЂС‹Р№ РІРѕР·РіР»Р°РІРёР» РњР°РЅС…СЌС‚С‚РµРЅСЃРєРёР№ РїСЂРѕРµРєС‚ Рё СЃС‚РѕР»РєРЅСѓР»СЃСЏ СЃ РїРѕСЃР»РµРґСЃС‚РІРёСЏРјРё СЃРѕР±СЃС‚РІРµРЅРЅРѕРіРѕ РѕС‚РєСЂС‹С‚РёСЏ.", reviews: [{ author: "Р’Р»Р°Рґ", text: "РџР»РѕС‚РЅС‹Р№ С„РёР»СЊРј, РЅРѕ Р°РєС‚РµСЂСЃРєР°СЏ СЂР°Р±РѕС‚Р° Рё РјРѕРЅС‚Р°Р¶ РґРµСЂР¶Р°С‚ РІСЃРµ С‚СЂРё С‡Р°СЃР°." }, { author: "РљР°С‚СЏ", text: "РџРѕСЃР»Рµ РїСЂРѕСЃРјРѕС‚СЂР° С…РѕС‡РµС‚СЃСЏ С‡РёС‚Р°С‚СЊ РґР°Р»СЊС€Рµ РїСЂРѕ СЂРµР°Р»СЊРЅСѓСЋ РёСЃС‚РѕСЂРёСЋ." }], placements: { home: true, recommended: false, genres: true, random: true } }
+      { id: "finch", title: "Finch", year: 2021, time: "115 мин", rating: 6.9, genres: ["Приключения", "Драма", "Sci-Fi"], poster: "https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/oE6bhqqVFyIECtBzqIuvh6JdaB5.jpg", description: "Робот, созданный инженером после глобальной катастрофы, учится заботиться о собаке своего создателя и понимать, что делает людей людьми.", reviews: [{ author: "Ирина", text: "Спокойная фантастика с теплой эмоцией. Идеально для вечера без суеты." }, { author: "Максим", text: "Том Хэнкс вытягивает даже тишину, а робот неожиданно трогательный." }], placements: { home: true, recommended: false, genres: true, random: true } },
+      { id: "dune-2", title: "Дюна: Часть вторая", year: 2024, time: "166 мин", rating: 8.5, genres: ["Фантастика", "Драма", "Приключения"], poster: "https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg", description: "Пол Атрейдес объединяется с фременами и идет к судьбе, которая может изменить Арракис и всю империю.", reviews: [{ author: "Артем", text: "Монументально, красиво и очень мощно на большом экране." }, { author: "Лена", text: "Вторая часть заметно быстрее первой, а музыка держит напряжение." }], placements: { home: true, recommended: true, genres: true, random: true } },
+      { id: "godzilla", title: "Monarch: Legacy of Monsters", year: 2023, time: "1 сезон", rating: 8.4, genres: ["Sci-Fi", "Драма", "Экшен"], poster: "https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/628Dep6AxEtDxjZoGP78TsOxYbK.jpg", description: "После атаки Годзиллы семья раскрывает связь с тайной организацией Monarch и наследием огромных монстров.", reviews: [{ author: "Сергей", text: "Семейная драма работает лучше, чем ожидал, а монстры появляются вовремя." }, { author: "Ника", text: "Красиво снято, хорошо идет как сериал на несколько вечеров." }], placements: { home: true, recommended: true, genres: true, random: true } },
+      { id: "poor-things", title: "Бедные-несчастные", year: 2023, time: "142 мин", rating: 7.8, genres: ["Комедия", "Драма", "Фэнтези"], poster: "https://image.tmdb.org/t/p/w780/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/bQS43HSLZzMjZkcHJz4fGc7fNdz.jpg", description: "Белла Бакстер открывает мир заново, превращая странное путешествие в историю свободы, любопытства и взросления.", reviews: [{ author: "Оля", text: "Очень необычно, визуально роскошно, местами смешно до неловкости." }, { author: "Денис", text: "Фильм не для всех, но если зайдет, запомнится надолго." }], placements: { home: true, recommended: false, genres: true, random: true } },
+      { id: "oppenheimer", title: "Оппенгеймер", year: 2023, time: "181 мин", rating: 8.1, genres: ["История", "Драма", "Биография"], poster: "https://image.tmdb.org/t/p/w780/ptpr0kGAckfQkJeJIt8st5dglvd.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg", description: "История ученого, который возглавил Манхэттенский проект и столкнулся с последствиями собственного открытия.", reviews: [{ author: "Влад", text: "Плотный фильм, но актерская работа и монтаж держат все три часа." }, { author: "Катя", text: "После просмотра хочется читать дальше про реальную историю." }], placements: { home: true, recommended: false, genres: true, random: true } }
     ];
 
     let state = loadState();
     let activeIndex = 0;
     let currentTab = "home";
-    let currentGenre = "Р’СЃРµ";
+    let currentGenre = "Все";
     let randomMovie = moviePool("random")[0] || state.movies[0];
     let pointerStart = null;
     let dragX = 0;
@@ -651,6 +651,7 @@
     let isAnimating = false;
     const imageCache = new Map();
     let editingId = null;
+    let currentDetailMovie = null;
 
     const $ = (selector) => document.querySelector(selector);
     const deck = $("#deck");
@@ -764,7 +765,7 @@
       activeIndex = Math.min(activeIndex, Math.max(0, movies.length - 1));
       const fragment = document.createDocumentFragment();
       if (!movies.length) {
-        deck.innerHTML = '<p class="empty">Р¤РёР»СЊРјС‹ РЅРµ РЅР°Р№РґРµРЅС‹</p>';
+        deck.innerHTML = '<p class="empty">Фильмы не найдены</p>';
         $("#movieInfo").innerHTML = "";
         return;
       }
@@ -782,7 +783,7 @@
         card.className = `movie-card${distance === 0 ? " is-active" : ""}`;
         card.dataset.distance = distance;
         card.dataset.id = movie.id;
-        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">в… ${movie.rating}</div>`;
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
         card.addEventListener("pointerdown", startDrag);
         card.addEventListener("click", openActiveCard);
         fragment.appendChild(card);
@@ -797,7 +798,7 @@
       const info = $("#movieInfo");
       info.innerHTML = `
         <h2>${movie.title}</h2>
-        <div class="meta">${movie.year} В· ${movie.time} В· в… ${movie.rating}</div>
+        <div class="meta">${movie.year} · ${movie.time} · ★ ${movie.rating}</div>
         <p>${movie.description}</p>
       `;
     }
@@ -810,7 +811,7 @@
         image.src = poster(movie);
         image.alt = movie.title;
       }
-      if (rating) rating.textContent = `в… ${movie.rating}`;
+      if (rating) rating.textContent = `★ ${movie.rating}`;
     }
 
     function openActiveCard(event) {
@@ -929,14 +930,14 @@
     function renderRows(container, movies) {
       container.innerHTML = "";
       if (!movies.length) {
-        container.innerHTML = '<p class="empty">Р—РґРµСЃСЊ РїРѕРєР° РїСѓСЃС‚Рѕ. Р”РѕР±Р°РІСЊС‚Рµ С„РёР»СЊРј С‡РµСЂРµР· Р°РґРјРёРЅРєСѓ.</p>';
+        container.innerHTML = '<p class="empty">Здесь пока пусто. Добавьте фильм через админку.</p>';
         return;
       }
       movies.forEach((movie) => {
         const card = document.createElement("button");
         card.type = "button";
         card.className = "row-card";
-        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">в… ${movie.rating}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">★ ${movie.rating}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         card.addEventListener("click", () => openDetail(movie));
         container.appendChild(card);
       });
@@ -944,13 +945,13 @@
 
     function renderRecommended() {
       const movies = moviePool("recommended");
-      $("#recommendedCount").textContent = `${movies.length} С„РёР»СЊРјРѕРІ`;
+      $("#recommendedCount").textContent = `${movies.length} фильмов`;
       renderRows($("#recommendedList"), movies);
     }
 
     function renderGenres() {
       const source = moviePool("genres");
-      const genres = ["Р’СЃРµ", ...new Set(source.flatMap((movie) => movie.genres))];
+      const genres = ["Все", ...new Set(source.flatMap((movie) => movie.genres))];
       $("#genreBar").innerHTML = genres.map((genre) => `<button class="chip${genre === currentGenre ? " active" : ""}" type="button" data-genre="${genre}">${genre}</button>`).join("");
       $("#genreBar").querySelectorAll("button").forEach((button) => {
         button.addEventListener("click", () => {
@@ -958,7 +959,7 @@
           renderGenres();
         });
       });
-      const movies = currentGenre === "Р’СЃРµ" ? source : source.filter((movie) => movie.genres.includes(currentGenre));
+      const movies = currentGenre === "Все" ? source : source.filter((movie) => movie.genres.includes(currentGenre));
       renderRows($("#genreList"), movies);
     }
 
@@ -968,12 +969,20 @@
       $("#randomPoster").innerHTML = randomMovie ? `<img src="${poster(randomMovie)}" alt="${randomMovie.title}">` : "";
     }
 
+    function youtubeTrailerUrl(movie) {
+      const value = (movie?.trailerId || "").trim();
+      if (value.includes("youtube.com") || value.includes("youtu.be")) return value;
+      if (value) return `https://www.youtube.com/watch?v=${encodeURIComponent(value)}`;
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${movie?.title || ""} трейлер`)}`;
+    }
+
     function openDetail(movie) {
       if (!movie) return;
+      currentDetailMovie = movie;
       randomMovie = movie;
       $("#detailHero").style.backgroundImage = `url("${backdrop(movie)}")`;
       $("#detailTitle").textContent = movie.title;
-      $("#detailMeta").innerHTML = `<span>в… ${movie.rating}</span><span>${movie.year}</span><span>${movie.time}</span><span>HD</span><span>${movie.genres.join(", ")}</span>`;
+      $("#detailMeta").innerHTML = `<span>★ ${movie.rating}</span><span>${movie.year}</span><span>${movie.time}</span><span>HD</span><span>${movie.genres.join(", ")}</span>`;
       $("#detailDescription").textContent = movie.description;
       $("#detailReviews").innerHTML = movie.reviews.map((review) => `<div class="review"><b>${review.author}:</b> ${review.text}</div>`).join("");
       detail.classList.add("active");
@@ -983,6 +992,7 @@
     function closeDetail() {
       detail.classList.remove("active");
       detail.setAttribute("aria-hidden", "true");
+      currentDetailMovie = null;
     }
 
     function setTab(tab) {
@@ -1006,7 +1016,7 @@
     function parseReviews(value) {
       return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
         const [author, ...text] = line.split(":");
-        return { author: text.length ? author.trim() : "Р—СЂРёС‚РµР»СЊ", text: (text.length ? text.join(":") : line).trim() };
+        return { author: text.length ? author.trim() : "Зритель", text: (text.length ? text.join(":") : line).trim() };
       });
     }
 
@@ -1058,19 +1068,19 @@
     function saveAdminMovie() {
       const title = $("#adminTitle").value.trim();
       if (!title) {
-        alert("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ С„РёР»СЊРјР°.");
+        alert("Введите название фильма.");
         return;
       }
       const movie = {
         id: editingId || `custom-${Date.now()}`,
         title,
         year: Number($("#adminYear").value) || new Date().getFullYear(),
-        time: $("#adminTime").value.trim() || "120 РјРёРЅ",
+        time: $("#adminTime").value.trim() || "120 мин",
         rating: Number($("#adminRating").value) || 0,
         genres: $("#adminGenres").value.split(",").map((genre) => genre.trim()).filter(Boolean),
         poster: $("#adminPoster").value.trim() || fallbackPoster,
         backdrop: $("#adminBackdrop").value.trim() || $("#adminPoster").value.trim() || fallbackPoster,
-        description: $("#adminDescription").value.trim() || "РћРїРёСЃР°РЅРёРµ РїРѕРєР° РЅРµ РґРѕР±Р°РІР»РµРЅРѕ.",
+        description: $("#adminDescription").value.trim() || "Описание пока не добавлено.",
         reviews: parseReviews($("#adminReviews").value) || [],
         placements: {
           home: $("#placeHome").checked,
@@ -1079,8 +1089,8 @@
           random: $("#placeRandom").checked
         }
       };
-      if (!movie.genres.length) movie.genres = ["Р‘РµР· Р¶Р°РЅСЂР°"];
-      if (!movie.reviews.length) movie.reviews = [{ author: "РђРґРјРёРЅ", text: "Р”РѕР±Р°РІР»РµРЅРѕ РІСЂСѓС‡РЅСѓСЋ." }];
+      if (!movie.genres.length) movie.genres = ["Без жанра"];
+      if (!movie.reviews.length) movie.reviews = [{ author: "Админ", text: "Добавлено вручную." }];
       const index = state.movies.findIndex((item) => item.id === movie.id);
       if (index >= 0) state.movies[index] = movie;
       else state.movies.unshift(movie);
@@ -1095,7 +1105,7 @@
     function deleteAdminMovie() {
       if (!editingId) return;
       const movie = state.movies.find((item) => item.id === editingId);
-      if (!movie || !confirm(`РЈРґР°Р»РёС‚СЊ "${movie.title}"?`)) return;
+      if (!movie || !confirm(`Удалить "${movie.title}"?`)) return;
       state.movies = state.movies.filter((item) => item.id !== editingId);
       saveState();
       activeIndex = 0;
@@ -1107,7 +1117,7 @@
     async function loadTmdbMovies() {
       const key = $("#apiKey").value.trim();
       if (!key) {
-        alert("Р’СЃС‚Р°РІСЊС‚Рµ TMDb API key РІ РїРѕР»Рµ РІС‹С€Рµ.");
+        alert("Вставьте TMDb API key в поле выше.");
         return;
       }
       state.apiKey = key;
@@ -1122,11 +1132,11 @@
           year: (item.release_date || "").slice(0, 4) || "2026",
           time: "TMDb",
           rating: Number(item.vote_average || 0).toFixed(1),
-          genres: ["TMDb", "РџРѕРїСѓР»СЏСЂРЅРѕРµ"],
+          genres: ["TMDb", "Популярное"],
           poster: item.poster_path ? imageBase + item.poster_path : fallbackPoster,
           backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w1280" + item.backdrop_path : "",
-          description: item.overview || "РћРїРёСЃР°РЅРёРµ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРЅРѕ РїРѕСЃР»Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ РґР°РЅРЅС‹С… TMDb.",
-          reviews: [{ author: "TMDb", text: `РЎСЂРµРґРЅСЏСЏ РѕС†РµРЅРєР° Р·СЂРёС‚РµР»РµР№: ${Number(item.vote_average || 0).toFixed(1)}.` }, { author: "Movie Mood", text: "Р”РѕР±Р°РІР»РµРЅРѕ РёР· РїРѕРїСѓР»СЏСЂРЅРѕР№ РїРѕРґР±РѕСЂРєРё TMDb." }],
+          description: item.overview || "Описание будет доступно после обновления данных TMDb.",
+          reviews: [{ author: "TMDb", text: `Средняя оценка зрителей: ${Number(item.vote_average || 0).toFixed(1)}.` }, { author: "Movie Mood", text: "Добавлено из популярной подборки TMDb." }],
           placements: { home: true, recommended: false, genres: true, random: true }
         }));
         const known = new Set(state.movies.map((movie) => movie.id));
@@ -1135,9 +1145,9 @@
         activeIndex = 0;
         renderAll();
         renderAdminSelect();
-        alert("Р¤РёР»СЊРјС‹ TMDb Р·Р°РіСЂСѓР¶РµРЅС‹.");
+        alert("Фильмы TMDb загружены.");
       } catch {
-        alert("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ TMDb. РџСЂРѕРІРµСЂСЊС‚Рµ РєР»СЋС‡ Рё РёРЅС‚РµСЂРЅРµС‚.");
+        alert("Не удалось загрузить TMDb. Проверьте ключ и интернет.");
       }
     }
 
@@ -1173,7 +1183,7 @@
     $("#closeAdmin").addEventListener("click", () => closeModal("#adminModal"));
     $("#loginBtn").addEventListener("click", () => {
       if ($("#adminPassword").value === ADMIN_PASSWORD) showAdmin();
-      else alert("РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ.");
+      else alert("Неверный пароль.");
     });
     $("#adminPassword").addEventListener("keydown", (event) => {
       if (event.key === "Enter") $("#loginBtn").click();
@@ -1193,7 +1203,10 @@
       const movie = visibleMovies()[activeIndex] || randomMovie;
       addRecommendation(movie.id);
     });
-    $("#trailerBtn").addEventListener("click", () => alert("Р—РґРµСЃСЊ РјРѕР¶РЅРѕ РїРѕРґРєР»СЋС‡РёС‚СЊ С‚СЂРµР№Р»РµСЂС‹ TMDb Videos API."));
+    $("#trailerBtn").addEventListener("click", () => {
+      if (!currentDetailMovie) return;
+      window.open(youtubeTrailerUrl(currentDetailMovie), "_blank", "noopener");
+    });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeDetail();
@@ -1223,7 +1236,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=4").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=5").catch(() => {});
       });
     }
   </script>
