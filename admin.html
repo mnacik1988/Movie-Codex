@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Movie Mood Admin</title>
+  <style>
+    :root {
+      --bg: #080b14;
+      --panel: rgba(28, 31, 45, .86);
+      --panel-2: rgba(255, 255, 255, .07);
+      --line: rgba(255, 255, 255, .13);
+      --text: #fff;
+      --muted: rgba(255, 255, 255, .62);
+      --accent: #f58ba8;
+      --teal: #7dd6de;
+      --danger: #ff6f7d;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .45);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(83, 213, 222, .2), transparent 34%),
+        radial-gradient(circle at 85% 10%, rgba(245, 139, 168, .22), transparent 32%),
+        var(--bg);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { border: 0; cursor: pointer; color: inherit; }
+    .wrap { width: min(1060px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 56px; }
+    .top { display: flex; justify-content: space-between; gap: 18px; align-items: center; margin-bottom: 26px; }
+    h1 { margin: 0; font-size: clamp(34px, 6vw, 54px); line-height: .95; }
+    p { color: var(--muted); }
+    a { color: inherit; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .grid { display: grid; grid-template-columns: minmax(280px, 390px) 1fr; gap: 18px; align-items: start; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(20px);
+    }
+    .field { display: grid; gap: 8px; margin-bottom: 12px; }
+    label { color: var(--muted); font-size: 13px; font-weight: 800; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(9, 12, 22, .78);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+    }
+    textarea { min-height: 96px; resize: vertical; }
+    input[type="file"] { padding: 10px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-2);
+      color: var(--text);
+    }
+    .primary, .ghost, .danger {
+      min-height: 44px;
+      border-radius: 999px;
+      padding: 0 16px;
+      font-weight: 900;
+    }
+    .primary { color: #071016; background: linear-gradient(135deg, var(--teal), var(--accent)); }
+    .ghost { background: var(--panel-2); border: 1px solid var(--line); }
+    .danger { background: rgba(255, 111, 125, .13); border: 1px solid rgba(255, 111, 125, .36); color: #ffd7dc; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .login { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 18px; }
+    .status { min-height: 24px; color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+    .movie-list { display: grid; gap: 10px; }
+    .movie-item {
+      display: grid;
+      grid-template-columns: 62px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--line);
+    }
+    .movie-item img { width: 62px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 12px; background: #161b29; }
+    .movie-item h3 { margin: 0 0 5px; font-size: 16px; }
+    .movie-item p { margin: 0; font-size: 13px; }
+    .empty { text-align: center; padding: 30px 12px; border: 1px dashed var(--line); border-radius: 18px; }
+    .hidden { display: none; }
+
+    @media (max-width: 780px) {
+      .grid, .login { grid-template-columns: 1fr; }
+      .top { align-items: flex-start; flex-direction: column; }
+      .top-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div>
+        <h1>Movie Mood Admin</h1>
+        <p>Добавляй фильмы, постеры, жанры, рейтинги и места показа.</p>
+      </div>
+      <div class="top-actions">
+        <a class="ghost" href="index.html" style="display:inline-grid;place-items:center;text-decoration:none;">Открыть приложение</a>
+        <button id="logoutBtn" class="ghost hidden" type="button">Выйти</button>
+      </div>
+    </header>
+
+    <section id="loginCard" class="card">
+      <p class="status" id="loginStatus">Если Firebase еще не включен, админка будет работать локально только в этом браузере.</p>
+      <div class="login">
+        <div class="field">
+          <label for="email">Email администратора</label>
+          <input id="email" type="email" autocomplete="username" placeholder="admin@email.com">
+        </div>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Пароль Firebase">
+        </div>
+        <button id="loginBtn" class="primary" type="button">Войти</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <form id="movieForm" class="card">
+        <input id="movieId" type="hidden">
+        <div class="actions" style="margin-bottom:14px;">
+          <button id="newBtn" class="ghost" type="button">Новый фильм</button>
+          <button id="deleteBtn" class="danger" type="button">Удалить</button>
+        </div>
+        <div class="field"><label for="title">Название</label><input id="title" required placeholder="Название фильма"></div>
+        <div class="row">
+          <div class="field"><label for="year">Год</label><input id="year" type="number" placeholder="2026"></div>
+          <div class="field"><label for="time">Время</label><input id="time" placeholder="120 мин"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="rating">Рейтинг</label><input id="rating" type="number" min="0" max="10" step="0.1" placeholder="8.0"></div>
+          <div class="field"><label for="sort">Порядок</label><input id="sort" type="number" placeholder="10"></div>
+        </div>
+        <div class="field"><label for="genres">Жанры через запятую</label><input id="genres" placeholder="Драма, Sci-Fi"></div>
+        <div class="field"><label for="poster">Постер URL</label><input id="poster" placeholder="https://..."></div>
+        <div class="field"><label for="posterFile">Загрузить постер в Firebase Storage</label><input id="posterFile" type="file" accept="image/*"></div>
+        <div class="field"><label for="backdrop">Фон URL</label><input id="backdrop" placeholder="https://..."></div>
+        <div class="field"><label for="backdropFile">Загрузить фон в Firebase Storage</label><input id="backdropFile" type="file" accept="image/*"></div>
+        <div class="field"><label for="trailerId">YouTube ID трейлера</label><input id="trailerId" placeholder="Например: dQw4w9WgXcQ"></div>
+        <div class="field"><label for="description">Описание</label><textarea id="description" placeholder="Короткое описание фильма"></textarea></div>
+        <div class="field"><label for="reviews">Отзывы, каждый с новой строки</label><textarea id="reviews" placeholder="Анна: Отличный фильм"></textarea></div>
+        <div class="field">
+          <label>Где показывать</label>
+          <div class="checks">
+            <label><input id="placeHome" type="checkbox" checked> Главная</label>
+            <label><input id="placeRecommended" type="checkbox"> Рекомендуемые</label>
+            <label><input id="placeGenres" type="checkbox" checked> Жанры</label>
+            <label><input id="placeRandom" type="checkbox" checked> Рандом</label>
+          </div>
+        </div>
+        <button class="primary" type="submit" style="width:100%;">Сохранить фильм</button>
+      </form>
+
+      <section class="card">
+        <p class="status" id="status"></p>
+        <div id="movieList" class="movie-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module">
+    import { deleteMovie, getMovies, isFirebaseEnabled, saveMovie, signInAdmin, signOutAdmin, uploadImage } from "./firebase-db.js";
+
+    const STORAGE_KEY = "movieMoodState";
+    const fallbackPoster = "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=780&q=80";
+    const $ = (selector) => document.querySelector(selector);
+    let movies = [];
+    let cloudMode = isFirebaseEnabled();
+    let signedIn = !cloudMode;
+
+    function setStatus(text) {
+      $("#status").textContent = text;
+    }
+
+    function localState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { movies: [] };
+      } catch {
+        return { movies: [] };
+      }
+    }
+
+    function saveLocalMovies() {
+      const state = localState();
+      state.movies = movies;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function parseReviews(value) {
+      return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+        const [author, ...text] = line.split(":");
+        return { author: text.length ? author.trim() : "Зритель", text: (text.length ? text.join(":") : author).trim() };
+      });
+    }
+
+    function resetForm() {
+      $("#movieForm").reset();
+      $("#movieId").value = "";
+      $("#year").value = new Date().getFullYear();
+      $("#sort").value = movies.length + 1;
+      $("#placeHome").checked = true;
+      $("#placeGenres").checked = true;
+      $("#placeRandom").checked = true;
+      $("#placeRecommended").checked = false;
+    }
+
+    function fillForm(movie) {
+      $("#movieId").value = movie.id || "";
+      $("#title").value = movie.title || "";
+      $("#year").value = movie.year || new Date().getFullYear();
+      $("#time").value = movie.time || "";
+      $("#rating").value = movie.rating || "";
+      $("#sort").value = movie.sort || 0;
+      $("#genres").value = (movie.genres || []).join(", ");
+      $("#poster").value = movie.poster || "";
+      $("#backdrop").value = movie.backdrop || "";
+      $("#trailerId").value = movie.trailerId || "";
+      $("#description").value = movie.description || "";
+      $("#reviews").value = (movie.reviews || []).map((review) => `${review.author}: ${review.text}`).join("\n");
+      $("#placeHome").checked = movie.placements?.home !== false;
+      $("#placeRecommended").checked = Boolean(movie.placements?.recommended);
+      $("#placeGenres").checked = movie.placements?.genres !== false;
+      $("#placeRandom").checked = movie.placements?.random !== false;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderList() {
+      const container = $("#movieList");
+      if (!movies.length) {
+        container.innerHTML = '<div class="empty"><p>Фильмов пока нет. Добавь первый фильм слева.</p></div>';
+        return;
+      }
+      container.innerHTML = movies.map((movie) => `
+        <article class="movie-item">
+          <img src="${movie.poster || fallbackPoster}" alt="">
+          <span>
+            <h3>${movie.title}</h3>
+            <p>${movie.year || ""} · ★ ${movie.rating || 0} · ${(movie.genres || []).join(", ")}</p>
+          </span>
+          <button class="ghost" type="button" data-edit="${movie.id}">Править</button>
+        </article>
+      `).join("");
+      container.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => fillForm(movies.find((movie) => movie.id === button.dataset.edit)));
+      });
+    }
+
+    async function loadMovies() {
+      if (cloudMode && signedIn) {
+        movies = await getMovies();
+        setStatus("Данные загружены из Firebase.");
+      } else {
+        movies = localState().movies || [];
+        setStatus("Firebase выключен. Данные сохраняются локально в этом браузере.");
+      }
+      renderList();
+      resetForm();
+    }
+
+    async function maybeUpload(fileInput, prefix) {
+      const file = fileInput.files?.[0];
+      if (!file) return "";
+      if (!cloudMode) {
+        alert("Загрузка файлов работает только после включения Firebase Storage.");
+        return "";
+      }
+      setStatus("Загружаю картинку...");
+      return uploadImage(file, prefix);
+    }
+
+    $("#loginBtn").addEventListener("click", async () => {
+      if (!cloudMode) {
+        signedIn = true;
+        await loadMovies();
+        return;
+      }
+      try {
+        await signInAdmin($("#email").value.trim(), $("#password").value);
+        signedIn = true;
+        $("#loginCard").classList.add("hidden");
+        $("#logoutBtn").classList.remove("hidden");
+        await loadMovies();
+      } catch (error) {
+        $("#loginStatus").textContent = "Не удалось войти. Проверь email, пароль и настройки Firebase Auth.";
+        console.warn(error);
+      }
+    });
+
+    $("#logoutBtn").addEventListener("click", async () => {
+      await signOutAdmin();
+      signedIn = false;
+      $("#loginCard").classList.remove("hidden");
+      $("#logoutBtn").classList.add("hidden");
+    });
+
+    $("#newBtn").addEventListener("click", resetForm);
+
+    $("#deleteBtn").addEventListener("click", async () => {
+      const id = $("#movieId").value;
+      if (!id) return;
+      const movie = movies.find((item) => item.id === id);
+      if (!movie || !confirm(`Удалить "${movie.title}"?`)) return;
+      if (cloudMode) await deleteMovie(id);
+      movies = movies.filter((item) => item.id !== id);
+      if (!cloudMode) saveLocalMovies();
+      renderList();
+      resetForm();
+      setStatus("Фильм удален.");
+    });
+
+    $("#movieForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (cloudMode && !signedIn) {
+        setStatus("Сначала войди в Firebase.");
+        return;
+      }
+      const posterUpload = await maybeUpload($("#posterFile"), "poster");
+      const backdropUpload = await maybeUpload($("#backdropFile"), "backdrop");
+      const movie = {
+        id: $("#movieId").value || `movie-${Date.now()}`,
+        title: $("#title").value.trim(),
+        year: Number($("#year").value) || new Date().getFullYear(),
+        time: $("#time").value.trim() || "120 мин",
+        rating: Number($("#rating").value) || 0,
+        sort: Number($("#sort").value) || movies.length + 1,
+        genres: $("#genres").value.split(",").map((genre) => genre.trim()).filter(Boolean),
+        poster: posterUpload || $("#poster").value.trim() || fallbackPoster,
+        backdrop: backdropUpload || $("#backdrop").value.trim() || posterUpload || $("#poster").value.trim() || fallbackPoster,
+        trailerId: $("#trailerId").value.trim(),
+        description: $("#description").value.trim() || "Описание пока не добавлено.",
+        reviews: parseReviews($("#reviews").value),
+        placements: {
+          home: $("#placeHome").checked,
+          recommended: $("#placeRecommended").checked,
+          genres: $("#placeGenres").checked,
+          random: $("#placeRandom").checked
+        }
+      };
+      if (!movie.title) return;
+      if (!movie.genres.length) movie.genres = ["Без жанра"];
+      if (!movie.reviews.length) movie.reviews = [{ author: "Админ", text: "Добавлено вручную." }];
+
+      if (cloudMode) await saveMovie(movie);
+      const index = movies.findIndex((item) => item.id === movie.id);
+      if (index >= 0) movies[index] = movie;
+      else movies.unshift(movie);
+      movies.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+      if (!cloudMode) saveLocalMovies();
+      renderList();
+      fillForm(movie);
+      setStatus("Фильм сохранен.");
+    });
+
+    if (!cloudMode) {
+      $("#loginCard").classList.add("hidden");
+      loadMovies();
+    }
+  </script>
+</body>
+</html>

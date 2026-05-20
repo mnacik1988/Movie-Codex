@@ -1,0 +1,1211 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movie Mood</title>
+  <meta name="theme-color" content="#080b14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Movie Mood">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <style>
+    :root {
+      --ink: #f8f8ff;
+      --muted: #9aa1b5;
+      --line: rgba(255, 255, 255, .13);
+      --gold: #ffc84d;
+      --teal: #42dcc6;
+      --blue: #83aaff;
+      --danger: #ff6b7d;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .42);
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 5%, rgba(66, 220, 198, .17), transparent 30%),
+        radial-gradient(circle at 82% 10%, rgba(255, 95, 117, .14), transparent 30%),
+        linear-gradient(145deg, #111322 0%, #080b14 44%, #05070d 100%);
+      overflow-x: hidden;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { border: 0; color: inherit; cursor: pointer; }
+    svg { width: 22px; height: 22px; flex: 0 0 auto; }
+
+    .app {
+      width: min(100%, 460px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 22px 104px;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 10vw, 46px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .hello p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #111322;
+      font-weight: 900;
+      background: linear-gradient(145deg, #a3e7ff, #ff8092);
+      box-shadow: 0 10px 28px rgba(255, 95, 117, .22);
+    }
+
+    .search {
+      height: 62px;
+      display: grid;
+      grid-template-columns: 26px 1fr 34px;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      margin-bottom: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(32, 34, 53, .72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+      overflow: hidden;
+    }
+
+    .search-icon {
+      width: 24px !important;
+      height: 24px !important;
+      max-width: 24px;
+      max-height: 24px;
+      display: block;
+    }
+
+    .search input {
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: 16px;
+    }
+
+    .search input::placeholder { color: #747b91; }
+
+    .voice {
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      border-left: 1px solid var(--line);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .home-stage {
+      min-height: 648px;
+      padding-top: 12px;
+      position: relative;
+      overflow: visible;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .deck-zone {
+      height: 455px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      overflow: visible;
+      isolation: isolate;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    .movie-card {
+      width: min(72vw, 292px);
+      aspect-ratio: 2 / 3;
+      position: absolute;
+      overflow: hidden;
+      border-radius: 24px;
+      background: #151927;
+      box-shadow: var(--shadow);
+      transform-origin: center;
+      transition: transform .68s cubic-bezier(.18, .9, .16, 1), opacity .68s ease, filter .68s ease;
+      will-change: transform, opacity, filter;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    .deck-zone.is-resetting .movie-card {
+      transition: none;
+    }
+
+    .home-stage.is-dragging .movie-card,
+    .home-stage.is-dragging .movie-info {
+      transition: none;
+    }
+
+    .movie-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    .movie-card:not(.is-active) {
+      box-shadow: none;
+    }
+
+    .movie-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 56%, rgba(0, 0, 0, .72) 100%);
+    }
+
+    .movie-card.is-active {
+      z-index: 5;
+      cursor: grab;
+    }
+
+    .rating-pill {
+      position: absolute;
+      z-index: 2;
+      left: 16px;
+      bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(10, 12, 20, .68);
+      backdrop-filter: blur(10px);
+      font-weight: 850;
+      font-size: 14px;
+    }
+
+    .movie-info {
+      width: min(78vw, 330px);
+      margin: 10px auto 0;
+      text-align: center;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity .34s ease, transform .34s ease;
+    }
+
+    .movie-info h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .movie-info .meta {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .movie-info p {
+      margin: 0;
+      color: rgba(255, 255, 255, .58);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2 { margin: 0; font-size: 24px; }
+    .section-head span { color: var(--muted); font-size: 13px; }
+
+    .primary, .ghost, .chip {
+      min-height: 46px;
+      border-radius: 999px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .1);
+      backdrop-filter: blur(12px);
+    }
+
+    .primary { color: #121522; background: #f8f9ff; font-weight: 850; }
+    .ghost { color: var(--ink); background: rgba(255, 255, 255, .08); font-weight: 750; }
+    .danger { color: #fff; background: rgba(255, 107, 125, .24); border-color: rgba(255, 107, 125, .45); }
+
+    .list-grid { display: grid; gap: 14px; }
+
+    .row-card {
+      display: grid;
+      grid-template-columns: 76px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-align: left;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .row-card img { width: 76px; height: 108px; object-fit: cover; border-radius: 8px; }
+    .row-card h3 { margin: 0 0 7px; font-size: 17px; }
+    .row-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .score { display: inline-flex; gap: 5px; margin-top: 9px; color: var(--gold); font-weight: 850; font-size: 14px; }
+
+    .genre-shell {
+      position: relative;
+      margin: 0 -22px 16px;
+      padding: 0 22px;
+      overflow: hidden;
+    }
+
+    .genre-bar {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 2px 0 0;
+      scrollbar-width: none;
+    }
+
+    .genre-bar::-webkit-scrollbar { display: none; }
+    .chip { min-height: 38px; color: var(--muted); white-space: nowrap; }
+    .chip.active { color: #071016; background: var(--teal); border-color: transparent; font-weight: 850; }
+
+    .random-stage { min-height: 520px; display: grid; align-content: center; gap: 18px; }
+    .random-poster { width: min(82vw, 330px); margin: 0 auto; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 24px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .random-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .field { display: grid; gap: 7px; margin-bottom: 12px; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 750; }
+    .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 8px; outline: 0; color: var(--ink); background: rgba(255, 255, 255, .08); padding: 12px; }
+    .field textarea { resize: vertical; min-height: 82px; }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0 14px;
+    }
+
+    .check-grid label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      color: rgba(255, 255, 255, .82);
+      font-size: 13px;
+    }
+
+    .admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .admin-actions.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    .detail,
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      overflow-y: auto;
+      background: #080b14;
+      transform: translateY(100%);
+      transition: transform .36s ease;
+    }
+
+    .detail.active,
+    .modal.active { transform: translateY(0); }
+
+    .modal {
+      z-index: 40;
+      display: grid;
+      align-items: end;
+      background: rgba(4, 6, 12, .72);
+      backdrop-filter: blur(18px);
+    }
+
+    .modal-card {
+      width: min(100%, 520px);
+      max-height: 92vh;
+      overflow-y: auto;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 24px 24px 0 0;
+      border: 1px solid var(--line);
+      background: rgba(15, 18, 30, .96);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-head h2 { margin: 0; font-size: 22px; }
+
+    .detail-hero {
+      min-height: 100vh;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+      display: grid;
+      align-items: end;
+      padding: 18px 18px 24px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .detail-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5, 7, 13, .1), rgba(5, 7, 13, .26) 42%, rgba(5, 7, 13, .84));
+    }
+
+    .detail-top {
+      position: absolute;
+      z-index: 2;
+      inset: 18px 18px auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .18);
+      border: 1px solid rgba(255, 255, 255, .2);
+      backdrop-filter: blur(12px);
+    }
+
+    .side-actions { display: grid; gap: 10px; }
+
+    .detail-sheet {
+      position: relative;
+      z-index: 1;
+      padding: 24px;
+      border-radius: 24px;
+      background: rgba(29, 24, 23, .58);
+      border: 1px solid rgba(255, 255, 255, .16);
+      backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+    }
+
+    .detail-sheet h2 { margin: 0 0 8px; font-size: 34px; line-height: 1; }
+    .detail-sheet .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; color: rgba(255, 255, 255, .82); font-size: 14px; }
+    .description { margin: 0 0 18px; color: rgba(255, 255, 255, .84); line-height: 1.5; font-size: 15px; }
+    .reviews { display: grid; gap: 10px; margin: 18px 0; }
+    .review { padding: 12px; border-radius: 8px; background: rgba(255, 255, 255, .09); color: rgba(255, 255, 255, .86); font-size: 13px; line-height: 1.42; }
+    .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      z-index: 20;
+      width: min(calc(100% - 32px), 420px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(9, 12, 22, .74);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .4);
+    }
+
+    .nav-btn {
+      min-width: 0;
+      height: 58px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      gap: 4px;
+      color: #858ba0;
+      background: transparent;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .nav-btn.active { color: #fff; background: rgba(255, 255, 255, .1); }
+    .empty { color: var(--muted); text-align: center; padding: 50px 16px; }
+
+    @media (max-width: 380px) {
+      .app { padding-inline: 16px; }
+      .movie-card { width: 74vw; }
+      .nav-btn { font-size: 10px; }
+      .detail-sheet { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="hello">
+        <h1>Movie Mood</h1>
+        <p>Подберем фильм на вечер</p>
+      </div>
+      <button id="adminEntry" class="avatar" type="button" aria-label="Админ">M</button>
+    </header>
+
+    <label class="search">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="searchInput" type="search" placeholder="Поиск фильма">
+      <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    </label>
+
+    <section id="home" class="screen active">
+      <div id="homeStage" class="home-stage">
+        <div id="deck" class="deck-zone" aria-label="Свайп фильмов"></div>
+        <div id="movieInfo" class="movie-info"></div>
+      </div>
+    </section>
+
+    <section id="recommended" class="screen">
+      <div class="section-head">
+        <h2>Рекомендуемые</h2>
+        <span id="recommendedCount"></span>
+      </div>
+      <div id="recommendedList" class="list-grid"></div>
+    </section>
+
+    <section id="genres" class="screen">
+      <div class="section-head">
+        <h2>По жанру</h2>
+        <span>Выберите настроение</span>
+      </div>
+      <div class="genre-shell">
+        <div id="genreBar" class="genre-bar"></div>
+      </div>
+      <div id="genreList" class="list-grid"></div>
+    </section>
+
+    <section id="random" class="screen">
+      <div class="section-head">
+        <h2>Рандомный фильм</h2>
+        <span>Один тап</span>
+      </div>
+      <div class="random-stage">
+        <div id="randomPoster" class="random-poster"></div>
+        <button id="randomBtn" class="primary" type="button">Подобрать фильм</button>
+      </div>
+    </section>
+  </main>
+
+  <aside id="detail" class="detail" aria-hidden="true">
+    <div id="detailHero" class="detail-hero">
+      <div class="detail-top">
+        <button id="closeDetail" class="icon-btn" type="button" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="side-actions">
+          <button class="icon-btn" type="button" id="addCurrent" aria-label="Добавить"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button class="icon-btn" type="button" aria-label="Нравится"><svg viewBox="0 0 24 24" fill="none"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="detail-sheet">
+        <h2 id="detailTitle"></h2>
+        <div id="detailMeta" class="meta"></div>
+        <p id="detailDescription" class="description"></p>
+        <div id="detailReviews" class="reviews"></div>
+        <div class="detail-actions"><button class="primary" type="button">Смотреть</button><button class="ghost" type="button" id="trailerBtn">Трейлер</button></div>
+      </div>
+    </div>
+  </aside>
+
+  <aside id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Вход в админ</h2>
+        <button id="closeLogin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
+      </div>
+      <div class="field">
+        <label for="adminPassword">Пароль</label>
+        <input id="adminPassword" type="password" placeholder="Введите пароль">
+      </div>
+      <button id="loginBtn" class="primary" type="button">Войти</button>
+    </div>
+  </aside>
+
+  <aside id="adminModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Админ-панель</h2>
+        <button id="closeAdmin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
+      </div>
+      <div class="field">
+        <label for="adminMovieSelect">Редактировать фильм</label>
+        <select id="adminMovieSelect"></select>
+      </div>
+      <div class="admin-actions">
+        <button id="newMovieBtn" class="ghost" type="button">Новый</button>
+        <button id="deleteMovieBtn" class="ghost danger" type="button">Удалить</button>
+      </div>
+      <div class="field"><label for="adminTitle">Название</label><input id="adminTitle" placeholder="Название фильма"></div>
+      <div class="field"><label for="adminPoster">Постер</label><input id="adminPoster" placeholder="https://..."></div>
+      <div class="field"><label for="adminBackdrop">Фон описания</label><input id="adminBackdrop" placeholder="https://..."></div>
+      <div class="admin-actions">
+        <div class="field"><label for="adminYear">Год</label><input id="adminYear" type="number" placeholder="2026"></div>
+        <div class="field"><label for="adminTime">Время</label><input id="adminTime" placeholder="120 мин"></div>
+      </div>
+      <div class="field"><label for="adminRating">Звезды</label><input id="adminRating" type="number" min="0" max="10" step="0.1" placeholder="8.0"></div>
+      <div class="field"><label for="adminGenres">Жанры через запятую</label><input id="adminGenres" placeholder="Драма, Sci-Fi"></div>
+      <div class="field"><label for="adminDescription">Описание</label><textarea id="adminDescription" placeholder="Короткое описание фильма"></textarea></div>
+      <div class="field"><label for="adminReviews">Отзывы, каждый с новой строки</label><textarea id="adminReviews" placeholder="Анна: Очень понравилось"></textarea></div>
+      <div class="field">
+        <label>Где показывать</label>
+        <div class="check-grid">
+          <label><input id="placeHome" type="checkbox"> Главная</label>
+          <label><input id="placeRecommended" type="checkbox"> Рекомендуемые</label>
+          <label><input id="placeGenres" type="checkbox"> Жанры</label>
+          <label><input id="placeRandom" type="checkbox"> Рандом</label>
+        </div>
+      </div>
+      <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb"></div>
+      <div class="admin-actions">
+        <button id="saveMovieBtn" class="primary" type="button">Сохранить</button>
+        <button id="loadTmdb" class="ghost" type="button">TMDb</button>
+      </div>
+    </div>
+  </aside>
+
+  <nav class="bottom-nav" aria-label="Главное меню">
+    <button class="nav-btn active" type="button" data-tab="home" aria-label="Главная"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V21h-6v-5.5H9V21H3v-9.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Главная</button>
+    <button class="nav-btn" type="button" data-tab="recommended" aria-label="Рекомендуемые"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5h10a2 2 0 0 1 2 2v14l-7-4-7 4V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Рекоменд.</button>
+    <button class="nav-btn" type="button" data-tab="genres" aria-label="По жанру"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Жанры</button>
+    <button class="nav-btn" type="button" data-tab="random" aria-label="Рандомный фильм"><svg viewBox="0 0 24 24" fill="none"><path d="M16 3h5v5M21 3l-7.5 7.5M4 20l6.5-6.5M15 20h6v-6M21 20l-7.5-7.5M4 4l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Рандом</button>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = "movieMoodState";
+    const ADMIN_PASSWORD = "1234";
+    const imageBase = "https://image.tmdb.org/t/p/w780";
+    const fallbackPoster = "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=780&q=80";
+
+    const defaultPlacements = { home: true, recommended: false, genres: true, random: true };
+    const defaultMovies = [
+      { id: "finch", title: "Finch", year: 2021, time: "115 мин", rating: 6.9, genres: ["Приключения", "Драма", "Sci-Fi"], poster: "https://image.tmdb.org/t/p/w780/jKuDyqx7jrjiR9cDzB5pxzhJAdv.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/oE6bhqqVFyIECtBzqIuvh6JdaB5.jpg", description: "Робот, созданный инженером после глобальной катастрофы, учится заботиться о собаке своего создателя и понимать, что делает людей людьми.", reviews: [{ author: "Ирина", text: "Спокойная фантастика с теплой эмоцией. Идеально для вечера без суеты." }, { author: "Максим", text: "Том Хэнкс вытягивает даже тишину, а робот неожиданно трогательный." }], placements: { home: true, recommended: false, genres: true, random: true } },
+      { id: "dune-2", title: "Дюна: Часть вторая", year: 2024, time: "166 мин", rating: 8.5, genres: ["Фантастика", "Драма", "Приключения"], poster: "https://image.tmdb.org/t/p/w780/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg", description: "Пол Атрейдес объединяется с фременами и идет к судьбе, которая может изменить Арракис и всю империю.", reviews: [{ author: "Артем", text: "Монументально, красиво и очень мощно на большом экране." }, { author: "Лена", text: "Вторая часть заметно быстрее первой, а музыка держит напряжение." }], placements: { home: true, recommended: true, genres: true, random: true } },
+      { id: "godzilla", title: "Monarch: Legacy of Monsters", year: 2023, time: "1 сезон", rating: 8.4, genres: ["Sci-Fi", "Драма", "Экшен"], poster: "https://image.tmdb.org/t/p/w780/uwrQHMnXD2DA1rvaMZk4pavZ3CY.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/628Dep6AxEtDxjZoGP78TsOxYbK.jpg", description: "После атаки Годзиллы семья раскрывает связь с тайной организацией Monarch и наследием огромных монстров.", reviews: [{ author: "Сергей", text: "Семейная драма работает лучше, чем ожидал, а монстры появляются вовремя." }, { author: "Ника", text: "Красиво снято, хорошо идет как сериал на несколько вечеров." }], placements: { home: true, recommended: true, genres: true, random: true } },
+      { id: "poor-things", title: "Бедные-несчастные", year: 2023, time: "142 мин", rating: 7.8, genres: ["Комедия", "Драма", "Фэнтези"], poster: "https://image.tmdb.org/t/p/w780/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/bQS43HSLZzMjZkcHJz4fGc7fNdz.jpg", description: "Белла Бакстер открывает мир заново, превращая странное путешествие в историю свободы, любопытства и взросления.", reviews: [{ author: "Оля", text: "Очень необычно, визуально роскошно, местами смешно до неловкости." }, { author: "Денис", text: "Фильм не для всех, но если зайдет, запомнится надолго." }], placements: { home: true, recommended: false, genres: true, random: true } },
+      { id: "oppenheimer", title: "Оппенгеймер", year: 2023, time: "181 мин", rating: 8.1, genres: ["История", "Драма", "Биография"], poster: "https://image.tmdb.org/t/p/w780/ptpr0kGAckfQkJeJIt8st5dglvd.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg", description: "История ученого, который возглавил Манхэттенский проект и столкнулся с последствиями собственного открытия.", reviews: [{ author: "Влад", text: "Плотный фильм, но актерская работа и монтаж держат все три часа." }, { author: "Катя", text: "После просмотра хочется читать дальше про реальную историю." }], placements: { home: true, recommended: false, genres: true, random: true } }
+    ];
+
+    let state = loadState();
+    let activeIndex = 0;
+    let currentTab = "home";
+    let currentGenre = "Все";
+    let randomMovie = moviePool("random")[0] || state.movies[0];
+    let pointerStart = null;
+    let dragX = 0;
+    let dragged = false;
+    let isAnimating = false;
+    const imageCache = new Map();
+    let editingId = null;
+
+    const $ = (selector) => document.querySelector(selector);
+    const deck = $("#deck");
+    const homeStage = $("#homeStage");
+    const detail = $("#detail");
+
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return { movies: defaultMovies, apiKey: "" };
+      try {
+        const parsed = JSON.parse(saved);
+        const recommended = new Set(parsed.recommended || []);
+        const movies = (parsed.movies?.length ? parsed.movies : defaultMovies).map((movie) => migrateMovie(movie, recommended));
+        return { movies, apiKey: parsed.apiKey || "" };
+      } catch {
+        return { movies: defaultMovies, apiKey: "" };
+      }
+    }
+
+    function migrateMovie(movie, recommended = new Set()) {
+      const placements = { ...defaultPlacements, ...(movie.placements || {}) };
+      if (recommended.has(movie.id)) placements.recommended = true;
+      return { ...movie, placements };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function poster(movie) { return movie.poster || fallbackPoster; }
+    function backdrop(movie) { return movie.backdrop || poster(movie); }
+    function preloadImage(src) {
+      if (!src) return Promise.resolve();
+      if (imageCache.has(src)) return imageCache.get(src);
+      const image = new Image();
+      image.decoding = "async";
+      image.loading = "eager";
+      image.src = src;
+      const ready = image.decode ? image.decode().catch(() => {}) : new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+      });
+      imageCache.set(src, ready);
+      return ready;
+    }
+
+    function warmMovieImages(list) {
+      list.forEach((movie) => {
+        preloadImage(poster(movie));
+        preloadImage(backdrop(movie));
+      });
+    }
+
+    function isPlaced(movie, place) { return movie.placements?.[place] !== false; }
+
+    function moviePool(place) {
+      return state.movies.filter((movie) => isPlaced(movie, place));
+    }
+
+    function filteredMovies() {
+      const query = $("#searchInput").value.trim().toLowerCase();
+      const movies = moviePool("home");
+      if (!query) return movies;
+      return movies.filter((movie) => `${movie.title} ${movie.genres.join(" ")}`.toLowerCase().includes(query));
+    }
+
+    function visibleMovies() {
+      const list = filteredMovies();
+      return list.length ? list : moviePool("home");
+    }
+
+    function wrapIndex(index, total) {
+      return (index + total) % total;
+    }
+
+    function slotForDistance(distance, dx) {
+      const progress = Math.min(Math.abs(dx) / 258, 1);
+      const incoming = Math.abs(distance) === 1 && ((dx < 0 && distance > 0) || (dx > 0 && distance < 0));
+      const outgoing = distance === 0;
+      const visualDistance = distance + (dx / 258);
+      const sideScale = Math.max(.78, 1 - Math.abs(visualDistance) * .08);
+
+      if (!outgoing) {
+        const side = {
+          scale: sideScale,
+          opacity: .42,
+          blur: 3.2,
+          brightness: .58
+        };
+        if (!incoming) return side;
+        const focusProgress = Math.max(0, (progress - .55) / .45);
+        const blur = side.blur - (side.blur - 1.35) * progress - 1.35 * focusProgress;
+        return {
+          scale: side.scale + (1 - side.scale) * focusProgress,
+          opacity: side.opacity + (.82 - side.opacity) * progress + .18 * focusProgress,
+          blur: Math.max(0, blur),
+          brightness: side.brightness + (.78 - side.brightness) * progress + .22 * focusProgress
+        };
+      }
+
+      return {
+        scale: 1 + (sideScale - 1) * progress,
+        opacity: 1 - progress * .58,
+        blur: progress * 3.2,
+        brightness: 1 - progress * .42
+      };
+    }
+
+    function renderDeck() {
+      const movies = visibleMovies();
+      activeIndex = Math.min(activeIndex, Math.max(0, movies.length - 1));
+      const fragment = document.createDocumentFragment();
+      if (!movies.length) {
+        deck.innerHTML = '<p class="empty">Фильмы не найдены</p>';
+        $("#movieInfo").innerHTML = "";
+        return;
+      }
+
+      const total = movies.length;
+      const used = new Set();
+      [-2, -1, 0, 1, 2].forEach((distance) => {
+        const index = wrapIndex(activeIndex + distance, total);
+        if (used.has(index)) return;
+        used.add(index);
+        const movie = movies[index];
+        preloadImage(poster(movie));
+        const card = document.createElement("article");
+        card.className = `movie-card${distance === 0 ? " is-active" : ""}`;
+        card.dataset.distance = distance;
+        card.dataset.id = movie.id;
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
+        card.addEventListener("pointerdown", startDrag);
+        card.addEventListener("click", openActiveCard);
+        fragment.appendChild(card);
+      });
+      deck.replaceChildren(fragment);
+
+      updateCarousel(0);
+      renderMovieInfo(movies[activeIndex]);
+    }
+
+    function renderMovieInfo(movie) {
+      const info = $("#movieInfo");
+      info.innerHTML = `
+        <h2>${movie.title}</h2>
+        <div class="meta">${movie.year} · ${movie.time} · ★ ${movie.rating}</div>
+        <p>${movie.description}</p>
+      `;
+    }
+
+    function setCardMovie(card, movie) {
+      card.dataset.id = movie.id;
+      const image = card.querySelector("img");
+      const rating = card.querySelector(".rating-pill");
+      if (image && image.src !== poster(movie)) {
+        image.src = poster(movie);
+        image.alt = movie.title;
+      }
+      if (rating) rating.textContent = `★ ${movie.rating}`;
+    }
+
+    function openActiveCard(event) {
+      const card = event.currentTarget;
+      if (dragged || isAnimating || Number(card.dataset.distance) !== 0) return;
+      const movie = visibleMovies().find((item) => item.id === card.dataset.id);
+      if (movie) openDetail(movie);
+    }
+
+    function updateCarousel(dx) {
+      const infoOpacity = 1 - Math.min(Math.abs(dx) / 135, .86);
+      const info = $("#movieInfo");
+      info.style.opacity = infoOpacity;
+      info.style.transform = `translateY(${Math.abs(dx) * .025}px)`;
+      deck.querySelectorAll(".movie-card").forEach((card) => {
+        const distance = Number(card.dataset.distance);
+        const baseX = distance * 258;
+        const x = baseX + dx;
+        const progress = Math.min(Math.abs(dx) / 258, 1);
+        const visualDistance = distance + (dx / 258);
+        const tilt = visualDistance * 1.4;
+        const values = slotForDistance(distance, dx);
+        card.style.zIndex = String(Math.round(10 - Math.min(Math.abs(visualDistance), 4)));
+        card.style.transform = `translateX(${x}px) scale(${values.scale}) rotate(${tilt}deg)`;
+        card.style.opacity = values.opacity;
+        card.style.filter = `blur(${values.blur}px) saturate(.76) brightness(${values.brightness})`;
+      });
+    }
+
+    function moveDeck(step) {
+      if (isAnimating) return;
+      const movies = visibleMovies();
+      if (movies.length < 2) return;
+      isAnimating = true;
+      const finishDx = step > 0 ? -258 : 258;
+      const info = $("#movieInfo");
+      warmMovieImages(movies);
+      homeStage.classList.remove("is-dragging");
+      updateCarousel(finishDx);
+      info.style.opacity = 0;
+      info.style.transform = "translateY(8px)";
+      setTimeout(() => {
+        const nextIndex = wrapIndex(activeIndex + step, movies.length);
+        const pendingImages = [-2, -1, 0, 1, 2].map((distance) => preloadImage(poster(movies[wrapIndex(nextIndex + distance, movies.length)])));
+        Promise.all(pendingImages).then(() => {
+          activeIndex = nextIndex;
+          dragX = 0;
+          deck.classList.add("is-resetting");
+          deck.querySelectorAll(".movie-card").forEach((card) => {
+            let distance = Number(card.dataset.distance) - step;
+            if (distance < -2) distance = 2;
+            if (distance > 2) distance = -2;
+            const movie = movies[wrapIndex(activeIndex + distance, movies.length)];
+            card.dataset.distance = distance;
+            card.classList.toggle("is-active", distance === 0);
+            setCardMovie(card, movie);
+          });
+          updateCarousel(0);
+          renderMovieInfo(movies[activeIndex]);
+          const newInfo = $("#movieInfo");
+          newInfo.style.opacity = 0;
+          newInfo.style.transform = "translateY(8px)";
+          requestAnimationFrame(() => deck.classList.remove("is-resetting"));
+          requestAnimationFrame(() => {
+            newInfo.style.opacity = 1;
+            newInfo.style.transform = "translateY(0)";
+            isAnimating = false;
+          });
+        });
+      }, 520);
+    }
+
+    function startDrag(event) {
+      if (isAnimating) return;
+      if (Number(event.currentTarget.dataset.distance) !== 0) return;
+      pointerStart = { x: event.clientX, y: event.clientY };
+      dragged = false;
+      dragX = 0;
+      const card = event.currentTarget;
+      homeStage.classList.add("is-dragging");
+      card.setPointerCapture(event.pointerId);
+      card.addEventListener("pointermove", dragCard);
+      card.addEventListener("pointerup", endDrag, { once: true });
+      card.addEventListener("pointercancel", endDrag, { once: true });
+    }
+
+    function dragCard(event) {
+      if (!pointerStart) return;
+      dragX = Math.max(-250, Math.min(250, event.clientX - pointerStart.x));
+      if (Math.abs(dragX) > 8) dragged = true;
+      updateCarousel(dragX);
+    }
+
+    function endDrag(event) {
+      const card = event.currentTarget;
+      card.removeEventListener("pointermove", dragCard);
+      if (!pointerStart) return;
+      const dx = dragX;
+      pointerStart = null;
+      if (Math.abs(dx) > 118) {
+        moveDeck(dx > 0 ? -1 : 1);
+      } else {
+        homeStage.classList.remove("is-dragging");
+        dragX = 0;
+        updateCarousel(0);
+      }
+      setTimeout(() => { dragged = false; }, 0);
+    }
+
+    function renderRows(container, movies) {
+      container.innerHTML = "";
+      if (!movies.length) {
+        container.innerHTML = '<p class="empty">Здесь пока пусто. Добавьте фильм через админку.</p>';
+        return;
+      }
+      movies.forEach((movie) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "row-card";
+        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">★ ${movie.rating}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        card.addEventListener("click", () => openDetail(movie));
+        container.appendChild(card);
+      });
+    }
+
+    function renderRecommended() {
+      const movies = moviePool("recommended");
+      $("#recommendedCount").textContent = `${movies.length} фильмов`;
+      renderRows($("#recommendedList"), movies);
+    }
+
+    function renderGenres() {
+      const source = moviePool("genres");
+      const genres = ["Все", ...new Set(source.flatMap((movie) => movie.genres))];
+      $("#genreBar").innerHTML = genres.map((genre) => `<button class="chip${genre === currentGenre ? " active" : ""}" type="button" data-genre="${genre}">${genre}</button>`).join("");
+      $("#genreBar").querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentGenre = button.dataset.genre;
+          renderGenres();
+        });
+      });
+      const movies = currentGenre === "Все" ? source : source.filter((movie) => movie.genres.includes(currentGenre));
+      renderRows($("#genreList"), movies);
+    }
+
+    function renderRandom() {
+      const pool = moviePool("random");
+      randomMovie = pool.includes(randomMovie) ? randomMovie : (pool[0] || state.movies[0]);
+      $("#randomPoster").innerHTML = randomMovie ? `<img src="${poster(randomMovie)}" alt="${randomMovie.title}">` : "";
+    }
+
+    function openDetail(movie) {
+      if (!movie) return;
+      randomMovie = movie;
+      $("#detailHero").style.backgroundImage = `url("${backdrop(movie)}")`;
+      $("#detailTitle").textContent = movie.title;
+      $("#detailMeta").innerHTML = `<span>★ ${movie.rating}</span><span>${movie.year}</span><span>${movie.time}</span><span>HD</span><span>${movie.genres.join(", ")}</span>`;
+      $("#detailDescription").textContent = movie.description;
+      $("#detailReviews").innerHTML = movie.reviews.map((review) => `<div class="review"><b>${review.author}:</b> ${review.text}</div>`).join("");
+      detail.classList.add("active");
+      detail.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetail() {
+      detail.classList.remove("active");
+      detail.setAttribute("aria-hidden", "true");
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll(".screen").forEach((screen) => screen.classList.toggle("active", screen.id === tab));
+      document.querySelectorAll(".nav-btn").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
+      if (tab === "recommended") renderRecommended();
+      if (tab === "genres") renderGenres();
+      if (tab === "random") renderRandom();
+    }
+
+    function addRecommendation(movieId) {
+      const movie = state.movies.find((item) => item.id === movieId);
+      if (movie) {
+        movie.placements = { ...defaultPlacements, ...movie.placements, recommended: true };
+        saveState();
+      }
+      renderRecommended();
+    }
+
+    function parseReviews(value) {
+      return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+        const [author, ...text] = line.split(":");
+        return { author: text.length ? author.trim() : "Зритель", text: (text.length ? text.join(":") : line).trim() };
+      });
+    }
+
+    function openModal(id) {
+      $(id).classList.add("active");
+      $(id).setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal(id) {
+      $(id).classList.remove("active");
+      $(id).setAttribute("aria-hidden", "true");
+    }
+
+    function openAdminGate() {
+      window.location.href = "admin.html";
+    }
+
+    function showAdmin() {
+      closeModal("#loginModal");
+      renderAdminSelect();
+      fillAdminForm(state.movies[0] || null);
+      openModal("#adminModal");
+    }
+
+    function renderAdminSelect() {
+      $("#adminMovieSelect").innerHTML = state.movies.map((movie) => `<option value="${movie.id}">${movie.title}</option>`).join("");
+    }
+
+    function fillAdminForm(movie) {
+      editingId = movie?.id || null;
+      $("#adminMovieSelect").value = editingId || "";
+      $("#adminTitle").value = movie?.title || "";
+      $("#adminPoster").value = movie?.poster || "";
+      $("#adminBackdrop").value = movie?.backdrop || "";
+      $("#adminYear").value = movie?.year || new Date().getFullYear();
+      $("#adminTime").value = movie?.time || "";
+      $("#adminRating").value = movie?.rating || "";
+      $("#adminGenres").value = movie?.genres?.join(", ") || "";
+      $("#adminDescription").value = movie?.description || "";
+      $("#adminReviews").value = (movie?.reviews || []).map((review) => `${review.author}: ${review.text}`).join("\n");
+      const placements = { ...defaultPlacements, ...(movie?.placements || {}) };
+      $("#placeHome").checked = placements.home;
+      $("#placeRecommended").checked = placements.recommended;
+      $("#placeGenres").checked = placements.genres;
+      $("#placeRandom").checked = placements.random;
+      $("#apiKey").value = state.apiKey || "";
+    }
+
+    function saveAdminMovie() {
+      const title = $("#adminTitle").value.trim();
+      if (!title) {
+        alert("Введите название фильма.");
+        return;
+      }
+      const movie = {
+        id: editingId || `custom-${Date.now()}`,
+        title,
+        year: Number($("#adminYear").value) || new Date().getFullYear(),
+        time: $("#adminTime").value.trim() || "120 мин",
+        rating: Number($("#adminRating").value) || 0,
+        genres: $("#adminGenres").value.split(",").map((genre) => genre.trim()).filter(Boolean),
+        poster: $("#adminPoster").value.trim() || fallbackPoster,
+        backdrop: $("#adminBackdrop").value.trim() || $("#adminPoster").value.trim() || fallbackPoster,
+        description: $("#adminDescription").value.trim() || "Описание пока не добавлено.",
+        reviews: parseReviews($("#adminReviews").value) || [],
+        placements: {
+          home: $("#placeHome").checked,
+          recommended: $("#placeRecommended").checked,
+          genres: $("#placeGenres").checked,
+          random: $("#placeRandom").checked
+        }
+      };
+      if (!movie.genres.length) movie.genres = ["Без жанра"];
+      if (!movie.reviews.length) movie.reviews = [{ author: "Админ", text: "Добавлено вручную." }];
+      const index = state.movies.findIndex((item) => item.id === movie.id);
+      if (index >= 0) state.movies[index] = movie;
+      else state.movies.unshift(movie);
+      state.apiKey = $("#apiKey").value.trim();
+      saveState();
+      activeIndex = 0;
+      renderAll();
+      renderAdminSelect();
+      fillAdminForm(movie);
+    }
+
+    function deleteAdminMovie() {
+      if (!editingId) return;
+      const movie = state.movies.find((item) => item.id === editingId);
+      if (!movie || !confirm(`Удалить "${movie.title}"?`)) return;
+      state.movies = state.movies.filter((item) => item.id !== editingId);
+      saveState();
+      activeIndex = 0;
+      renderAll();
+      renderAdminSelect();
+      fillAdminForm(state.movies[0] || null);
+    }
+
+    async function loadTmdbMovies() {
+      const key = $("#apiKey").value.trim();
+      if (!key) {
+        alert("Вставьте TMDb API key в поле выше.");
+        return;
+      }
+      state.apiKey = key;
+      saveState();
+      try {
+        const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${encodeURIComponent(key)}&language=ru-RU&page=1`);
+        if (!response.ok) throw new Error("TMDb error");
+        const data = await response.json();
+        const imported = data.results.slice(0, 10).map((item) => ({
+          id: `tmdb-${item.id}`,
+          title: item.title || item.original_title,
+          year: (item.release_date || "").slice(0, 4) || "2026",
+          time: "TMDb",
+          rating: Number(item.vote_average || 0).toFixed(1),
+          genres: ["TMDb", "Популярное"],
+          poster: item.poster_path ? imageBase + item.poster_path : fallbackPoster,
+          backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w1280" + item.backdrop_path : "",
+          description: item.overview || "Описание будет доступно после обновления данных TMDb.",
+          reviews: [{ author: "TMDb", text: `Средняя оценка зрителей: ${Number(item.vote_average || 0).toFixed(1)}.` }, { author: "Movie Mood", text: "Добавлено из популярной подборки TMDb." }],
+          placements: { home: true, recommended: false, genres: true, random: true }
+        }));
+        const known = new Set(state.movies.map((movie) => movie.id));
+        state.movies = [...imported.filter((movie) => !known.has(movie.id)), ...state.movies];
+        saveState();
+        activeIndex = 0;
+        renderAll();
+        renderAdminSelect();
+        alert("Фильмы TMDb загружены.");
+      } catch {
+        alert("Не удалось загрузить TMDb. Проверьте ключ и интернет.");
+      }
+    }
+
+    function renderAll() {
+      renderDeck();
+      renderRecommended();
+      renderGenres();
+      renderRandom();
+    }
+
+    async function startCloudSync() {
+      try {
+        const cloud = await import("./firebase-db.js");
+        if (!cloud.isFirebaseEnabled()) return;
+        await cloud.listenMovies((movies) => {
+          if (!movies.length) return;
+          state.movies = movies.map((movie) => migrateMovie(movie));
+          saveState();
+          activeIndex = 0;
+          warmMovieImages(state.movies);
+          renderAll();
+        }, (error) => console.warn("Firebase movies sync failed", error));
+      } catch (error) {
+        console.warn("Firebase is unavailable, local movies are used", error);
+      }
+    }
+
+    document.querySelectorAll(".nav-btn").forEach((button) => button.addEventListener("click", () => setTab(button.dataset.tab)));
+    $("#closeDetail").addEventListener("click", closeDetail);
+    $("#searchInput").addEventListener("input", () => { activeIndex = 0; renderDeck(); });
+    $("#adminEntry").addEventListener("click", openAdminGate);
+    $("#closeLogin").addEventListener("click", () => closeModal("#loginModal"));
+    $("#closeAdmin").addEventListener("click", () => closeModal("#adminModal"));
+    $("#loginBtn").addEventListener("click", () => {
+      if ($("#adminPassword").value === ADMIN_PASSWORD) showAdmin();
+      else alert("Неверный пароль.");
+    });
+    $("#adminPassword").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") $("#loginBtn").click();
+    });
+    $("#adminMovieSelect").addEventListener("change", () => fillAdminForm(state.movies.find((movie) => movie.id === $("#adminMovieSelect").value)));
+    $("#newMovieBtn").addEventListener("click", () => fillAdminForm(null));
+    $("#deleteMovieBtn").addEventListener("click", deleteAdminMovie);
+    $("#saveMovieBtn").addEventListener("click", saveAdminMovie);
+    $("#loadTmdb").addEventListener("click", loadTmdbMovies);
+    $("#randomBtn").addEventListener("click", () => {
+      const pool = moviePool("random");
+      randomMovie = pool[Math.floor(Math.random() * pool.length)] || state.movies[0];
+      renderRandom();
+      openDetail(randomMovie);
+    });
+    $("#addCurrent").addEventListener("click", () => {
+      const movie = visibleMovies()[activeIndex] || randomMovie;
+      addRecommendation(movie.id);
+    });
+    $("#trailerBtn").addEventListener("click", () => alert("Здесь можно подключить трейлеры TMDb Videos API."));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeDetail();
+        closeModal("#loginModal");
+        closeModal("#adminModal");
+      }
+      if (currentTab === "home" && event.key === "ArrowRight") moveDeck(1);
+      if (currentTab === "home" && event.key === "ArrowLeft") moveDeck(-1);
+    });
+
+    warmMovieImages(state.movies);
+    renderAll();
+    startCloudSync();
+
+    const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
+    if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js?v=4").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
