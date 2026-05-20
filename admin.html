@@ -168,7 +168,7 @@
             <label><input id="placeRandom" type="checkbox" checked> Рандом</label>
           </div>
         </div>
-        <button class="primary" type="submit" style="width:100%;">Сохранить фильм</button>
+        <button id="saveBtn" class="primary" type="submit" style="width:100%;">Сохранить фильм</button>
       </form>
 
       <section class="card">
@@ -190,6 +190,22 @@
 
     function setStatus(text) {
       $("#status").textContent = text;
+    }
+
+    function firebaseMessage(error) {
+      const code = error?.code || "";
+      if (code.includes("permission-denied")) return "Нет доступа к Firebase. Проверь Firestore Rules и что ты вошел как админ.";
+      if (code.includes("unauthenticated")) return "Firebase не видит вход. Выйди и войди в админку снова.";
+      if (code.includes("auth/invalid-credential") || code.includes("auth/wrong-password") || code.includes("auth/user-not-found")) return "Неверный email или пароль администратора.";
+      if (code.includes("storage/")) return "Ошибка Storage. Пока Storage не включен, используй Постер URL и Фон URL, без выбора файла.";
+      if (code.includes("unavailable") || code.includes("network")) return "Нет связи с Firebase. Проверь интернет и настройки проекта.";
+      return `Ошибка Firebase: ${code || error?.message || "неизвестная ошибка"}`;
+    }
+
+    function setBusy(button, busy, text = "Подождите...") {
+      button.disabled = busy;
+      button.dataset.originalText ||= button.textContent;
+      button.textContent = busy ? text : button.dataset.originalText;
     }
 
     function localState() {
@@ -284,14 +300,18 @@
         alert("Загрузка файлов работает только после включения Firebase Storage.");
         return "";
       }
+      if (!confirm("Firebase Storage сейчас может быть недоступен. Если сохранение упадет, убери выбранный файл и вставь ссылку на картинку в поле URL. Продолжить загрузку файла?")) return "";
       setStatus("Загружаю картинку...");
       return uploadImage(file, prefix);
     }
 
     $("#loginBtn").addEventListener("click", async () => {
+      const button = $("#loginBtn");
+      setBusy(button, true, "Вхожу...");
       if (!cloudMode) {
         signedIn = true;
         await loadMovies();
+        setBusy(button, false);
         return;
       }
       try {
@@ -301,8 +321,10 @@
         $("#logoutBtn").classList.remove("hidden");
         await loadMovies();
       } catch (error) {
-        $("#loginStatus").textContent = "Не удалось войти. Проверь email, пароль и настройки Firebase Auth.";
+        $("#loginStatus").textContent = firebaseMessage(error);
         console.warn(error);
+      } finally {
+        setBusy(button, false);
       }
     });
 
@@ -330,10 +352,14 @@
 
     $("#movieForm").addEventListener("submit", async (event) => {
       event.preventDefault();
+      const button = $("#saveBtn");
       if (cloudMode && !signedIn) {
         setStatus("Сначала войди в Firebase.");
         return;
       }
+      setBusy(button, true, "Сохраняю...");
+      setStatus("Сохраняю фильм...");
+      try {
       const posterUpload = await maybeUpload($("#posterFile"), "poster");
       const backdropUpload = await maybeUpload($("#backdropFile"), "backdrop");
       const movie = {
@@ -356,7 +382,10 @@
           random: $("#placeRandom").checked
         }
       };
-      if (!movie.title) return;
+      if (!movie.title) {
+        setStatus("Введи название фильма.");
+        return;
+      }
       if (!movie.genres.length) movie.genres = ["Без жанра"];
       if (!movie.reviews.length) movie.reviews = [{ author: "Админ", text: "Добавлено вручную." }];
 
@@ -368,7 +397,13 @@
       if (!cloudMode) saveLocalMovies();
       renderList();
       fillForm(movie);
-      setStatus("Фильм сохранен.");
+      setStatus("Фильм сохранен. Открой приложение и обнови страницу.");
+      } catch (error) {
+        setStatus(firebaseMessage(error));
+        console.warn(error);
+      } finally {
+        setBusy(button, false);
+      }
     });
 
     if (!cloudMode) {
