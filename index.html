@@ -827,6 +827,13 @@
       return (index + total) % total;
     }
 
+    function circularDistance(index, active, total) {
+      let distance = index - active;
+      if (distance > total / 2) distance -= total;
+      if (distance < -total / 2) distance += total;
+      return distance;
+    }
+
     function slotForDistance(distance, dx) {
       const progress = Math.min(Math.abs(dx) / 258, 1);
       const incoming = Math.abs(distance) === 1 && ((dx < 0 && distance > 0) || (dx > 0 && distance < 0));
@@ -871,18 +878,13 @@
         return;
       }
 
-      const total = movies.length;
-      const used = new Set();
-      const distances = total === 1 ? [0] : total === 2 ? [-1, 0] : total === 3 ? [-1, 0, 1] : [-2, -1, 0, 1, 2];
-      distances.forEach((distance) => {
-        const index = wrapIndex(activeIndex + distance, total);
-        if (used.has(index)) return;
-        used.add(index);
-        const movie = movies[index];
+      movies.forEach((movie, index) => {
+        const distance = circularDistance(index, activeIndex, movies.length);
         preloadImage(poster(movie));
         const card = document.createElement("article");
         card.className = `movie-card${distance === 0 ? " is-active" : ""}`;
         card.dataset.distance = distance;
+        card.dataset.index = index;
         card.dataset.id = movie.id;
         card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
         card.addEventListener("pointerdown", startDrag);
@@ -918,7 +920,7 @@
     function openActiveCard(event) {
       const card = event.currentTarget;
       if (dragged || isAnimating || Number(card.dataset.distance) !== 0) return;
-      const movie = visibleMovies().find((item) => item.id === card.dataset.id);
+      const movie = visibleMovies()[Number(card.dataset.index)];
       if (movie) openDetail(movie);
     }
 
@@ -927,8 +929,12 @@
       const info = $("#movieInfo");
       info.style.opacity = infoOpacity;
       info.style.transform = `translateY(${Math.abs(dx) * .025}px)`;
+      const movies = visibleMovies();
+      const total = movies.length;
       deck.querySelectorAll(".movie-card").forEach((card) => {
-        const distance = Number(card.dataset.distance);
+        const index = Number(card.dataset.index);
+        const distance = circularDistance(index, activeIndex, total);
+        card.dataset.distance = distance;
         const baseX = distance * 258;
         const x = baseX + dx;
         const progress = Math.min(Math.abs(dx) / 258, 1);
@@ -937,7 +943,10 @@
         const values = slotForDistance(distance, dx);
         card.style.zIndex = String(Math.round(10 - Math.min(Math.abs(visualDistance), 4)));
         card.style.transform = `translateX(${x}px) scale(${values.scale}) rotate(${tilt}deg)`;
-        card.style.opacity = values.opacity;
+        const farAway = Math.abs(visualDistance) > 2.45;
+        card.style.opacity = farAway ? 0 : values.opacity;
+        card.style.pointerEvents = Math.abs(visualDistance) < .5 ? "auto" : "none";
+        card.classList.toggle("is-active", Math.abs(visualDistance) < .5);
         if (stableMobileCards) {
           card.style.filter = "none";
           card.style.setProperty("--card-dim", String(Math.max(0, Math.min(.52, 1 - values.brightness))));
@@ -952,12 +961,6 @@
       if (isAnimating) return;
       const movies = visibleMovies();
       if (movies.length < 2) return;
-      if (movies.length < 4) {
-        activeIndex = wrapIndex(activeIndex + step, movies.length);
-        dragX = 0;
-        renderDeck();
-        return;
-      }
       isAnimating = true;
       const finishDx = step > 0 ? -258 : 258;
       const info = $("#movieInfo");
@@ -968,31 +971,20 @@
       info.style.transform = "translateY(8px)";
       setTimeout(() => {
         const nextIndex = wrapIndex(activeIndex + step, movies.length);
-        const pendingImages = [-2, -1, 0, 1, 2].map((distance) => preloadImage(poster(movies[wrapIndex(nextIndex + distance, movies.length)])));
-        Promise.all(pendingImages).then(() => {
-          activeIndex = nextIndex;
-          dragX = 0;
-          deck.classList.add("is-resetting");
-          deck.querySelectorAll(".movie-card").forEach((card) => {
-            let distance = Number(card.dataset.distance) - step;
-            if (distance < -2) distance = 2;
-            if (distance > 2) distance = -2;
-            const movie = movies[wrapIndex(activeIndex + distance, movies.length)];
-            card.dataset.distance = distance;
-            card.classList.toggle("is-active", distance === 0);
-            setCardMovie(card, movie);
-          });
-          updateCarousel(0);
-          renderMovieInfo(movies[activeIndex]);
-          const newInfo = $("#movieInfo");
-          newInfo.style.opacity = 0;
-          newInfo.style.transform = "translateY(8px)";
-          requestAnimationFrame(() => deck.classList.remove("is-resetting"));
-          requestAnimationFrame(() => {
-            newInfo.style.opacity = 1;
-            newInfo.style.transform = "translateY(0)";
-            isAnimating = false;
-          });
+        activeIndex = nextIndex;
+        dragX = 0;
+        deck.classList.add("is-resetting");
+        updateCarousel(0);
+        renderMovieInfo(movies[activeIndex]);
+        const newInfo = $("#movieInfo");
+        newInfo.style.opacity = 0;
+        newInfo.style.transform = "translateY(8px)";
+        requestAnimationFrame(() => deck.classList.remove("is-resetting"));
+        setTimeout(() => deck.classList.remove("is-resetting"), 40);
+        requestAnimationFrame(() => {
+          newInfo.style.opacity = 1;
+          newInfo.style.transform = "translateY(0)";
+          isAnimating = false;
         });
       }, 520);
     }
@@ -1382,7 +1374,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=8").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=9").catch(() => {});
       });
     }
   </script>
