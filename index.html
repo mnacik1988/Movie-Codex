@@ -500,7 +500,7 @@
 
     <label class="search">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input id="searchInput" type="search" placeholder="Поиск фильма">
+      <input id="searchInput" type="search" name="movie-search" placeholder="Поиск фильма" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search">
       <span class="voice" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
     </label>
 
@@ -1203,6 +1203,8 @@
       if (currentTab === "home" && event.key === "ArrowLeft") moveDeck(-1);
     });
 
+    const searchInput = $("#searchInput");
+    if (searchInput.value.includes("@")) searchInput.value = "";
     warmMovieImages(state.movies);
     renderAll();
     startCloudSync();
