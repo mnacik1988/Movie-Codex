@@ -160,8 +160,9 @@
       background: #151927;
       box-shadow: var(--shadow);
       transform-origin: center;
-      transition: transform .68s cubic-bezier(.18, .9, .16, 1), opacity .68s ease, filter .68s ease;
-      will-change: transform, opacity, filter;
+      --card-dim: 0;
+      transition: transform .68s cubic-bezier(.18, .9, .16, 1), opacity .68s ease;
+      will-change: transform, opacity;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       transform: translateZ(0);
@@ -197,7 +198,10 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, transparent 56%, rgba(0, 0, 0, .72) 100%);
+      background:
+        linear-gradient(180deg, transparent 56%, rgba(0, 0, 0, .72) 100%),
+        rgba(0, 0, 0, var(--card-dim));
+      transition: background .68s ease;
     }
 
     .movie-card.is-active {
@@ -729,6 +733,7 @@
     let currentDetailMovie = null;
     let lastDeckKey = "";
     let searchTimer = null;
+    const stableMobileCards = matchMedia("(hover: none), (pointer: coarse)").matches;
 
     const $ = (selector) => document.querySelector(selector);
     const deck = $("#deck");
@@ -933,7 +938,13 @@
         card.style.zIndex = String(Math.round(10 - Math.min(Math.abs(visualDistance), 4)));
         card.style.transform = `translateX(${x}px) scale(${values.scale}) rotate(${tilt}deg)`;
         card.style.opacity = values.opacity;
-        card.style.filter = `blur(${values.blur}px) saturate(.76) brightness(${values.brightness})`;
+        if (stableMobileCards) {
+          card.style.filter = "none";
+          card.style.setProperty("--card-dim", String(Math.max(0, Math.min(.52, 1 - values.brightness))));
+        } else {
+          card.style.filter = `blur(${values.blur}px) saturate(.76) brightness(${values.brightness})`;
+          card.style.setProperty("--card-dim", "0");
+        }
       });
     }
 
@@ -1371,7 +1382,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=7").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=8").catch(() => {});
       });
     }
   </script>
