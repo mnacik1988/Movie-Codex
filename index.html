@@ -444,7 +444,71 @@
     .description { margin: 0 0 18px; color: rgba(255, 255, 255, .84); line-height: 1.5; font-size: 15px; }
     .reviews { display: grid; gap: 10px; margin: 18px 0; }
     .review { padding: 12px; border-radius: 8px; background: rgba(255, 255, 255, .09); color: rgba(255, 255, 255, .86); font-size: 13px; line-height: 1.42; }
-    .detail-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .detail-actions { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+    .trailer-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(3, 5, 10, .86);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s ease;
+    }
+
+    .trailer-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .trailer-box {
+      width: min(100%, 920px);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .16);
+      background: #080b14;
+      box-shadow: var(--shadow);
+    }
+
+    .trailer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+    }
+
+    .trailer-head h2 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .trailer-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+
+    .trailer-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .trailer-fallback {
+      display: none;
+      padding: 12px 14px 16px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 14px;
+    }
+
+    .trailer-fallback a { color: #fff; font-weight: 800; }
 
     .bottom-nav {
       position: fixed;
@@ -615,6 +679,17 @@
         <button id="saveMovieBtn" class="primary" type="button">Сохранить</button>
         <button id="loadTmdb" class="ghost" type="button">TMDb</button>
       </div>
+    </div>
+  </aside>
+
+  <aside id="trailerModal" class="trailer-modal" aria-hidden="true">
+    <div class="trailer-box">
+      <div class="trailer-head">
+        <h2 id="trailerTitle">Трейлер</h2>
+        <button id="closeTrailer" class="icon-btn" type="button" aria-label="Закрыть">×</button>
+      </div>
+      <div id="trailerFrame" class="trailer-frame"></div>
+      <div id="trailerFallback" class="trailer-fallback"></div>
     </div>
   </aside>
 
@@ -976,6 +1051,40 @@
       return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${movie?.title || ""} трейлер`)}`;
     }
 
+    function youtubeEmbedUrl(movie) {
+      const value = (movie?.trailerId || "").trim();
+      if (!value) return "";
+      let id = value;
+      if (value.includes("youtu.be/")) id = value.split("youtu.be/")[1].split(/[?&/]/)[0];
+      if (value.includes("watch?v=")) id = value.split("watch?v=")[1].split(/[?&]/)[0];
+      if (value.includes("/embed/")) id = value.split("/embed/")[1].split(/[?&/]/)[0];
+      return `https://www.youtube.com/embed/${encodeURIComponent(id)}?autoplay=1&playsinline=1&rel=0`;
+    }
+
+    function openTrailer(movie) {
+      if (!movie) return;
+      const modal = $("#trailerModal");
+      const frame = $("#trailerFrame");
+      const fallback = $("#trailerFallback");
+      const embedUrl = youtubeEmbedUrl(movie);
+      const externalUrl = youtubeTrailerUrl(movie);
+      $("#trailerTitle").textContent = movie.title;
+      frame.innerHTML = embedUrl
+        ? `<iframe src="${embedUrl}" title="Трейлер ${movie.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+        : "";
+      fallback.style.display = embedUrl ? "none" : "block";
+      fallback.innerHTML = `YouTube ID не указан. <a href="${externalUrl}" target="_blank" rel="noopener">Открыть поиск на YouTube</a>`;
+      modal.classList.add("active");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeTrailer() {
+      $("#trailerModal").classList.remove("active");
+      $("#trailerModal").setAttribute("aria-hidden", "true");
+      $("#trailerFrame").innerHTML = "";
+      $("#trailerFallback").innerHTML = "";
+    }
+
     function openDetail(movie) {
       if (!movie) return;
       currentDetailMovie = movie;
@@ -1177,6 +1286,10 @@
 
     document.querySelectorAll(".nav-btn").forEach((button) => button.addEventListener("click", () => setTab(button.dataset.tab)));
     $("#closeDetail").addEventListener("click", closeDetail);
+    $("#closeTrailer").addEventListener("click", closeTrailer);
+    $("#trailerModal").addEventListener("click", (event) => {
+      if (event.target.id === "trailerModal") closeTrailer();
+    });
     $("#searchInput").addEventListener("input", () => { activeIndex = 0; renderDeck(); });
     $("#adminEntry").addEventListener("click", openAdminGate);
     $("#closeLogin").addEventListener("click", () => closeModal("#loginModal"));
@@ -1205,11 +1318,12 @@
     });
     $("#trailerBtn").addEventListener("click", () => {
       if (!currentDetailMovie) return;
-      window.open(youtubeTrailerUrl(currentDetailMovie), "_blank", "noopener");
+      openTrailer(currentDetailMovie);
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeDetail();
+        closeTrailer();
         closeModal("#loginModal");
         closeModal("#adminModal");
       }
@@ -1236,7 +1350,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=5").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=6").catch(() => {});
       });
     }
   </script>
