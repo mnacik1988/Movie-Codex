@@ -46,7 +46,7 @@
       width: min(100%, 460px);
       min-height: 100vh;
       margin: 0 auto;
-      padding: 28px 22px 104px;
+      padding: 14px 22px 104px;
       position: relative;
     }
 
@@ -55,43 +55,44 @@
       align-items: center;
       justify-content: space-between;
       gap: 18px;
-      margin-bottom: 22px;
+      margin-bottom: 12px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(34px, 10vw, 46px);
+      font-size: clamp(18px, 5vw, 23px);
       line-height: 1;
       letter-spacing: 0;
     }
 
     .hello p {
-      margin: 8px 0 0;
+      margin: 5px 0 0;
       color: var(--muted);
-      font-size: 15px;
+      font-size: 13px;
     }
 
     .avatar {
-      width: 50px;
-      height: 50px;
+      width: 25px;
+      height: 25px;
       border-radius: 50%;
       display: grid;
       place-items: center;
       flex: 0 0 auto;
       color: #111322;
       font-weight: 900;
+      font-size: 12px;
       background: linear-gradient(145deg, #a3e7ff, #ff8092);
-      box-shadow: 0 10px 28px rgba(255, 95, 117, .22);
+      box-shadow: 0 6px 16px rgba(255, 95, 117, .18);
     }
 
     .search {
-      height: 62px;
+      height: 54px;
       display: grid;
       grid-template-columns: 26px 1fr 34px;
       align-items: center;
       gap: 12px;
       padding: 0 18px;
-      margin-bottom: 28px;
+      margin-bottom: 8px;
       border: 1px solid var(--line);
       border-radius: 24px;
       background: rgba(32, 34, 53, .72);
@@ -131,7 +132,7 @@
 
     .home-stage {
       min-height: 648px;
-      padding-top: 12px;
+      padding-top: 0;
       position: relative;
       overflow: visible;
       touch-action: pan-y;
@@ -139,7 +140,7 @@
     }
 
     .deck-zone {
-      height: 455px;
+      height: 390px;
       position: relative;
       display: grid;
       place-items: center;
@@ -1382,7 +1383,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=10").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=11").catch(() => {});
       });
     }
   </script>
