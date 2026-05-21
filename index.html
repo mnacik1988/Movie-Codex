@@ -132,7 +132,7 @@
 
     .home-stage {
       min-height: 648px;
-      padding-top: 0;
+      padding-top: 48px;
       position: relative;
       overflow: visible;
       touch-action: pan-y;
@@ -1383,7 +1383,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=11").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=12").catch(() => {});
       });
     }
   </script>
