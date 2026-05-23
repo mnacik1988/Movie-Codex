@@ -50,6 +50,9 @@ function normalizeMovie(id, data) {
     description: data.description || "",
     reviews: Array.isArray(data.reviews) ? data.reviews : [],
     trailerId: data.trailerId || "",
+    moods: Array.isArray(data.moods) ? data.moods : [],
+    collections: Array.isArray(data.collections) ? data.collections : [],
+    adminPick: data.adminPick || "",
     sort: Number(data.sort) || 0,
     placements: {
       home: data.placements?.home !== false,
