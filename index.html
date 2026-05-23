@@ -316,6 +316,9 @@
     .genre-bar::-webkit-scrollbar { display: none; }
     .chip { min-height: 38px; color: var(--muted); white-space: nowrap; }
     .chip.active { color: #071016; background: var(--teal); border-color: transparent; font-weight: 850; }
+    .mini-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 8px; }
+    .mini-actions .ghost.active { color: #071016; background: var(--teal); border-color: transparent; }
+    .admin-pick { display: inline-flex; margin: 0 0 12px; padding: 7px 10px; border-radius: 999px; background: rgba(255, 200, 77, .16); color: #ffd981; font-size: 13px; font-weight: 850; }
 
     .random-stage { min-height: 520px; display: grid; align-content: center; gap: 18px; }
     .random-poster { width: min(82vw, 330px); margin: 0 auto; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 24px; border: 1px solid var(--line); box-shadow: var(--shadow); }
@@ -586,6 +589,9 @@
         <h2>Рекомендуемые</h2>
         <span id="recommendedCount"></span>
       </div>
+      <div class="genre-shell">
+        <div id="collectionBar" class="genre-bar"></div>
+      </div>
       <div id="recommendedList" class="list-grid"></div>
     </section>
 
@@ -593,6 +599,9 @@
       <div class="section-head">
         <h2>По жанру</h2>
         <span>Выберите настроение</span>
+      </div>
+      <div class="genre-shell">
+        <div id="moodBar" class="genre-bar"></div>
       </div>
       <div class="genre-shell">
         <div id="genreBar" class="genre-bar"></div>
@@ -603,7 +612,7 @@
     <section id="random" class="screen">
       <div class="section-head">
         <h2>Рандомный фильм</h2>
-        <span>Один тап</span>
+        <span id="randomHint">Умный подбор</span>
       </div>
       <div class="random-stage">
         <div id="randomPoster" class="random-poster"></div>
@@ -624,8 +633,14 @@
       <div class="detail-sheet">
         <h2 id="detailTitle"></h2>
         <div id="detailMeta" class="meta"></div>
+        <div id="detailAdminPick"></div>
         <p id="detailDescription" class="description"></p>
         <div id="detailReviews" class="reviews"></div>
+        <div class="mini-actions">
+          <button id="likeBtn" class="ghost" type="button">Нравится</button>
+          <button id="dislikeBtn" class="ghost" type="button">Не мое</button>
+          <button id="watchBtn" class="ghost" type="button">Хочу</button>
+        </div>
         <div class="detail-actions"><button class="primary" type="button" id="trailerBtn">Смотреть трейлер</button></div>
       </div>
     </div>
@@ -719,11 +734,15 @@
       { id: "poor-things", title: "Бедные-несчастные", year: 2023, time: "142 мин", rating: 7.8, genres: ["Комедия", "Драма", "Фэнтези"], poster: "https://image.tmdb.org/t/p/w780/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/bQS43HSLZzMjZkcHJz4fGc7fNdz.jpg", description: "Белла Бакстер открывает мир заново, превращая странное путешествие в историю свободы, любопытства и взросления.", reviews: [{ author: "Оля", text: "Очень необычно, визуально роскошно, местами смешно до неловкости." }, { author: "Денис", text: "Фильм не для всех, но если зайдет, запомнится надолго." }], placements: { home: true, recommended: false, genres: true, random: true } },
       { id: "oppenheimer", title: "Оппенгеймер", year: 2023, time: "181 мин", rating: 8.1, genres: ["История", "Драма", "Биография"], poster: "https://image.tmdb.org/t/p/w780/ptpr0kGAckfQkJeJIt8st5dglvd.jpg", backdrop: "https://image.tmdb.org/t/p/w1280/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg", description: "История ученого, который возглавил Манхэттенский проект и столкнулся с последствиями собственного открытия.", reviews: [{ author: "Влад", text: "Плотный фильм, но актерская работа и монтаж держат все три часа." }, { author: "Катя", text: "После просмотра хочется читать дальше про реальную историю." }], placements: { home: true, recommended: false, genres: true, random: true } }
     ];
+    const defaultMoods = ["Легкое", "Напряженное", "Романтика", "Подумать", "Для компании", "Перед сном"];
+    const defaultCollections = ["Хочу посмотреть", "Лучшее на вечер", "После тяжелого дня", "Для двоих", "На выходные"];
 
     let state = loadState();
     let activeIndex = 0;
     let currentTab = "home";
     let currentGenre = "Все";
+    let currentMood = "Все";
+    let currentCollection = "Рекомендуемые";
     let randomMovie = moviePool("random")[0] || state.movies[0];
     let pointerStart = null;
     let dragX = 0;
@@ -735,6 +754,7 @@
     let lastDeckKey = "";
     let searchTimer = null;
     const stableMobileCards = matchMedia("(hover: none), (pointer: coarse)").matches;
+    let userPrefs = loadUserPrefs();
 
     const $ = (selector) => document.querySelector(selector);
     const deck = $("#deck");
@@ -757,11 +777,44 @@
     function migrateMovie(movie, recommended = new Set()) {
       const placements = { ...defaultPlacements, ...(movie.placements || {}) };
       if (recommended.has(movie.id)) placements.recommended = true;
-      return { ...movie, placements };
+      return {
+        ...movie,
+        moods: Array.isArray(movie.moods) ? movie.moods : [],
+        collections: Array.isArray(movie.collections) ? movie.collections : [],
+        adminPick: movie.adminPick || "",
+        trailerId: movie.trailerId || "",
+        placements
+      };
     }
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadUserPrefs() {
+      try {
+        return { likes: [], dislikes: [], watchlist: [], ...(JSON.parse(localStorage.getItem("movieMoodPrefs")) || {}) };
+      } catch {
+        return { likes: [], dislikes: [], watchlist: [] };
+      }
+    }
+
+    function saveUserPrefs() {
+      localStorage.setItem("movieMoodPrefs", JSON.stringify(userPrefs));
+    }
+
+    function hasPref(type, movieId) {
+      return userPrefs[type]?.includes(movieId);
+    }
+
+    function togglePref(type, movieId) {
+      if (!movieId) return;
+      const opposite = type === "likes" ? "dislikes" : type === "dislikes" ? "likes" : null;
+      userPrefs[type] = hasPref(type, movieId) ? userPrefs[type].filter((id) => id !== movieId) : [...userPrefs[type], movieId];
+      if (opposite) userPrefs[opposite] = userPrefs[opposite].filter((id) => id !== movieId);
+      saveUserPrefs();
+      updateDetailActions();
+      if (currentTab === "recommended") renderRecommended();
     }
 
     function poster(movie) { return movie.poster || fallbackPoster; }
@@ -932,7 +985,6 @@
       const info = $("#movieInfo");
       info.style.opacity = infoOpacity;
       info.style.transform = `translateY(${Math.abs(dx) * .025}px)`;
-      const movies = visibleMovies();
       deck.querySelectorAll(".movie-card").forEach((card) => {
         const distance = Number(card.dataset.distance);
         const baseX = distance * 258;
@@ -1051,14 +1103,42 @@
       });
     }
 
+    function allMoods() {
+      return [...new Set([...defaultMoods, ...state.movies.flatMap((movie) => movie.moods || [])])];
+    }
+
+    function allCollections() {
+      return [...new Set([...defaultCollections, ...state.movies.flatMap((movie) => movie.collections || [])])];
+    }
+
+    function renderChipBar(container, items, active, onPick) {
+      container.innerHTML = items.map((item) => `<button class="chip${item === active ? " active" : ""}" type="button" data-value="${item}">${item}</button>`).join("");
+      container.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => onPick(button.dataset.value)));
+    }
+
     function renderRecommended() {
-      const movies = moviePool("recommended");
+      const collections = ["Рекомендуемые", ...allCollections()];
+      renderChipBar($("#collectionBar"), collections, currentCollection, (value) => {
+        currentCollection = value;
+        renderRecommended();
+      });
+      let movies = moviePool("recommended");
+      if (currentCollection === "Хочу посмотреть") {
+        movies = state.movies.filter((movie) => hasPref("watchlist", movie.id));
+      } else if (currentCollection !== "Рекомендуемые") {
+        movies = state.movies.filter((movie) => movie.collections?.includes(currentCollection));
+      }
       $("#recommendedCount").textContent = `${movies.length} фильмов`;
       renderRows($("#recommendedList"), movies);
     }
 
     function renderGenres() {
       const source = moviePool("genres");
+      const moods = ["Все", ...allMoods()];
+      renderChipBar($("#moodBar"), moods, currentMood, (value) => {
+        currentMood = value;
+        renderGenres();
+      });
       const genres = ["Все", ...new Set(source.flatMap((movie) => movie.genres))];
       $("#genreBar").innerHTML = genres.map((genre) => `<button class="chip${genre === currentGenre ? " active" : ""}" type="button" data-genre="${genre}">${genre}</button>`).join("");
       $("#genreBar").querySelectorAll("button").forEach((button) => {
@@ -1067,14 +1147,39 @@
           renderGenres();
         });
       });
-      const movies = currentGenre === "Все" ? source : source.filter((movie) => movie.genres.includes(currentGenre));
+      const movies = source.filter((movie) => {
+        const genreOk = currentGenre === "Все" || movie.genres.includes(currentGenre);
+        const moodOk = currentMood === "Все" || movie.moods?.includes(currentMood);
+        return genreOk && moodOk;
+      });
       renderRows($("#genreList"), movies);
     }
 
+    function smartRandomPool() {
+      let pool = moviePool("random").filter((movie) => !hasPref("dislikes", movie.id));
+      if (currentMood !== "Все") {
+        const byMood = pool.filter((movie) => movie.moods?.includes(currentMood));
+        if (byMood.length) pool = byMood;
+      }
+      const likedGenres = new Set(state.movies.filter((movie) => hasPref("likes", movie.id)).flatMap((movie) => movie.genres));
+      return pool
+        .map((movie) => ({
+          movie,
+          score:
+            Number(movie.rating || 0) +
+            (hasPref("likes", movie.id) ? 6 : 0) +
+            (movie.adminPick ? 2 : 0) +
+            movie.genres.reduce((sum, genre) => sum + (likedGenres.has(genre) ? .8 : 0), 0)
+        }))
+        .sort((a, b) => b.score - a.score)
+        .map((item) => item.movie);
+    }
+
     function renderRandom() {
-      const pool = moviePool("random");
+      const pool = smartRandomPool();
       randomMovie = pool.includes(randomMovie) ? randomMovie : (pool[0] || state.movies[0]);
       $("#randomPoster").innerHTML = randomMovie ? `<img src="${poster(randomMovie)}" alt="${randomMovie.title}">` : "";
+      $("#randomHint").textContent = currentMood === "Все" ? "Умный подбор" : currentMood;
     }
 
     function youtubeTrailerUrl(movie) {
@@ -1125,10 +1230,19 @@
       $("#detailHero").style.backgroundImage = `url("${backdrop(movie)}")`;
       $("#detailTitle").textContent = movie.title;
       $("#detailMeta").innerHTML = `<span>★ ${movie.rating}</span><span>${movie.year}</span><span>${movie.time}</span><span>HD</span><span>${movie.genres.join(", ")}</span>`;
+      $("#detailAdminPick").innerHTML = movie.adminPick ? `<span class="admin-pick">${movie.adminPick}</span>` : "";
       $("#detailDescription").textContent = movie.description;
       $("#detailReviews").innerHTML = movie.reviews.map((review) => `<div class="review"><b>${review.author}:</b> ${review.text}</div>`).join("");
+      updateDetailActions();
       detail.classList.add("active");
       detail.setAttribute("aria-hidden", "false");
+    }
+
+    function updateDetailActions() {
+      if (!currentDetailMovie) return;
+      $("#likeBtn").classList.toggle("active", hasPref("likes", currentDetailMovie.id));
+      $("#dislikeBtn").classList.toggle("active", hasPref("dislikes", currentDetailMovie.id));
+      $("#watchBtn").classList.toggle("active", hasPref("watchlist", currentDetailMovie.id));
     }
 
     function closeDetail() {
@@ -1340,7 +1454,7 @@
     $("#saveMovieBtn").addEventListener("click", saveAdminMovie);
     $("#loadTmdb").addEventListener("click", loadTmdbMovies);
     $("#randomBtn").addEventListener("click", () => {
-      const pool = moviePool("random");
+      const pool = smartRandomPool();
       randomMovie = pool[Math.floor(Math.random() * pool.length)] || state.movies[0];
       renderRandom();
       openDetail(randomMovie);
@@ -1353,6 +1467,9 @@
       if (!currentDetailMovie) return;
       openTrailer(currentDetailMovie);
     });
+    $("#likeBtn").addEventListener("click", () => togglePref("likes", currentDetailMovie?.id));
+    $("#dislikeBtn").addEventListener("click", () => togglePref("dislikes", currentDetailMovie?.id));
+    $("#watchBtn").addEventListener("click", () => togglePref("watchlist", currentDetailMovie?.id));
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeDetail();
@@ -1383,7 +1500,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=12").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=13").catch(() => {});
       });
     }
   </script>
