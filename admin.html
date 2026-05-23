@@ -152,6 +152,9 @@
           <div class="field"><label for="sort">Порядок</label><input id="sort" type="number" placeholder="10"></div>
         </div>
         <div class="field"><label for="genres">Жанры через запятую</label><input id="genres" placeholder="Драма, Sci-Fi"></div>
+        <div class="field"><label for="moods">Настроения через запятую</label><input id="moods" placeholder="Легкое, Романтика, Перед сном"></div>
+        <div class="field"><label for="collections">Коллекции через запятую</label><input id="collections" placeholder="Лучшее на вечер, Для двоих"></div>
+        <div class="field"><label for="adminPick">Метка админа</label><input id="adminPick" placeholder="Советую / Точно смотреть / На любителя"></div>
         <div class="field"><label for="poster">Постер URL</label><input id="poster" placeholder="https://..."></div>
         <div class="field"><label for="posterFile">Загрузить постер в Firebase Storage</label><input id="posterFile" type="file" accept="image/*"></div>
         <div class="field"><label for="backdrop">Фон URL</label><input id="backdrop" placeholder="https://..."></div>
@@ -248,6 +251,9 @@
       $("#rating").value = movie.rating || "";
       $("#sort").value = movie.sort || 0;
       $("#genres").value = (movie.genres || []).join(", ");
+      $("#moods").value = (movie.moods || []).join(", ");
+      $("#collections").value = (movie.collections || []).join(", ");
+      $("#adminPick").value = movie.adminPick || "";
       $("#poster").value = movie.poster || "";
       $("#backdrop").value = movie.backdrop || "";
       $("#trailerId").value = movie.trailerId || "";
@@ -370,6 +376,9 @@
         rating: Number($("#rating").value) || 0,
         sort: Number($("#sort").value) || movies.length + 1,
         genres: $("#genres").value.split(",").map((genre) => genre.trim()).filter(Boolean),
+        moods: $("#moods").value.split(",").map((mood) => mood.trim()).filter(Boolean),
+        collections: $("#collections").value.split(",").map((collection) => collection.trim()).filter(Boolean),
+        adminPick: $("#adminPick").value.trim(),
         poster: posterUpload || $("#poster").value.trim() || fallbackPoster,
         backdrop: backdropUpload || $("#backdrop").value.trim() || posterUpload || $("#poster").value.trim() || fallbackPoster,
         trailerId: $("#trailerId").value.trim(),
