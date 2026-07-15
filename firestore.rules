@@ -4,7 +4,19 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /movies/{movieId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null;
+      allow create, update: if request.auth != null && isValidMovie(request.resource.data);
+      allow delete: if request.auth != null;
     }
+  }
+
+  function isValidMovie(data) {
+    return data.title is string && data.title.size() > 0 && data.title.size() < 200
+      && (!('description' in data) || (data.description is string && data.description.size() < 4000))
+      && (!('year' in data) || data.year is number)
+      && (!('rating' in data) || (data.rating is number && data.rating >= 0 && data.rating <= 10))
+      && (!('genres' in data) || (data.genres is list && data.genres.size() < 20))
+      && (!('moods' in data) || (data.moods is list && data.moods.size() < 20))
+      && (!('collections' in data) || (data.collections is list && data.collections.size() < 20))
+      && (!('reviews' in data) || (data.reviews is list && data.reviews.size() < 50));
   }
 }

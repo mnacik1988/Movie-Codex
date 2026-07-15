@@ -646,62 +646,6 @@
     </div>
   </aside>
 
-  <aside id="loginModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h2>Вход в админ</h2>
-        <button id="closeLogin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
-      </div>
-      <div class="field">
-        <label for="adminPassword">Пароль</label>
-        <input id="adminPassword" type="password" placeholder="Введите пароль">
-      </div>
-      <button id="loginBtn" class="primary" type="button">Войти</button>
-    </div>
-  </aside>
-
-  <aside id="adminModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h2>Админ-панель</h2>
-        <button id="closeAdmin" class="icon-btn" type="button" aria-label="Закрыть">×</button>
-      </div>
-      <div class="field">
-        <label for="adminMovieSelect">Редактировать фильм</label>
-        <select id="adminMovieSelect"></select>
-      </div>
-      <div class="admin-actions">
-        <button id="newMovieBtn" class="ghost" type="button">Новый</button>
-        <button id="deleteMovieBtn" class="ghost danger" type="button">Удалить</button>
-      </div>
-      <div class="field"><label for="adminTitle">Название</label><input id="adminTitle" placeholder="Название фильма"></div>
-      <div class="field"><label for="adminPoster">Постер</label><input id="adminPoster" placeholder="https://..."></div>
-      <div class="field"><label for="adminBackdrop">Фон описания</label><input id="adminBackdrop" placeholder="https://..."></div>
-      <div class="admin-actions">
-        <div class="field"><label for="adminYear">Год</label><input id="adminYear" type="number" placeholder="2026"></div>
-        <div class="field"><label for="adminTime">Время</label><input id="adminTime" placeholder="120 мин"></div>
-      </div>
-      <div class="field"><label for="adminRating">Звезды</label><input id="adminRating" type="number" min="0" max="10" step="0.1" placeholder="8.0"></div>
-      <div class="field"><label for="adminGenres">Жанры через запятую</label><input id="adminGenres" placeholder="Драма, Sci-Fi"></div>
-      <div class="field"><label for="adminDescription">Описание</label><textarea id="adminDescription" placeholder="Короткое описание фильма"></textarea></div>
-      <div class="field"><label for="adminReviews">Отзывы, каждый с новой строки</label><textarea id="adminReviews" placeholder="Анна: Очень понравилось"></textarea></div>
-      <div class="field">
-        <label>Где показывать</label>
-        <div class="check-grid">
-          <label><input id="placeHome" type="checkbox"> Главная</label>
-          <label><input id="placeRecommended" type="checkbox"> Рекомендуемые</label>
-          <label><input id="placeGenres" type="checkbox"> Жанры</label>
-          <label><input id="placeRandom" type="checkbox"> Рандом</label>
-        </div>
-      </div>
-      <div class="field"><label for="apiKey">TMDb API key</label><input id="apiKey" autocomplete="off" placeholder="Вставьте ключ TMDb"></div>
-      <div class="admin-actions">
-        <button id="saveMovieBtn" class="primary" type="button">Сохранить</button>
-        <button id="loadTmdb" class="ghost" type="button">TMDb</button>
-      </div>
-    </div>
-  </aside>
-
   <aside id="trailerModal" class="trailer-modal" aria-hidden="true">
     <div class="trailer-box">
       <div class="trailer-head">
@@ -722,7 +666,6 @@
 
   <script>
     const STORAGE_KEY = "movieMoodState";
-    const ADMIN_PASSWORD = "1234";
     const imageBase = "https://image.tmdb.org/t/p/w780";
     const fallbackPoster = "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=780&q=80";
 
@@ -749,7 +692,6 @@
     let dragged = false;
     let isAnimating = false;
     const imageCache = new Map();
-    let editingId = null;
     let currentDetailMovie = null;
     let lastDeckKey = "";
     let searchTimer = null;
@@ -760,6 +702,12 @@
     const deck = $("#deck");
     const homeStage = $("#homeStage");
     const detail = $("#detail");
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
 
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -942,7 +890,7 @@
         card.dataset.distance = distance;
         card.dataset.index = index;
         card.dataset.id = movie.id;
-        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><div class="rating-pill">★ ${movie.rating}</div>`;
+        card.innerHTML = `<img src="${escapeHtml(poster(movie))}" alt="${escapeHtml(movie.title)}"><div class="rating-pill">★ ${escapeHtml(movie.rating)}</div>`;
         card.addEventListener("pointerdown", startDrag);
         card.addEventListener("click", openActiveCard);
         fragment.appendChild(card);
@@ -956,9 +904,9 @@
     function renderMovieInfo(movie) {
       const info = $("#movieInfo");
       info.innerHTML = `
-        <h2>${movie.title}</h2>
-        <div class="meta">${movie.year} · ${movie.time} · ★ ${movie.rating}</div>
-        <p>${movie.description}</p>
+        <h2>${escapeHtml(movie.title)}</h2>
+        <div class="meta">${escapeHtml(movie.year)} · ${escapeHtml(movie.time)} · ★ ${escapeHtml(movie.rating)}</div>
+        <p>${escapeHtml(movie.description)}</p>
       `;
     }
 
@@ -1097,7 +1045,7 @@
         const card = document.createElement("button");
         card.type = "button";
         card.className = "row-card";
-        card.innerHTML = `<img src="${poster(movie)}" alt="${movie.title}"><span><h3>${movie.title}</h3><p>${movie.description}</p><span class="score">★ ${movie.rating}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        card.innerHTML = `<img src="${escapeHtml(poster(movie))}" alt="${escapeHtml(movie.title)}"><span><h3>${escapeHtml(movie.title)}</h3><p>${escapeHtml(movie.description)}</p><span class="score">★ ${escapeHtml(movie.rating)}</span></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         card.addEventListener("click", () => openDetail(movie));
         container.appendChild(card);
       });
@@ -1112,7 +1060,7 @@
     }
 
     function renderChipBar(container, items, active, onPick) {
-      container.innerHTML = items.map((item) => `<button class="chip${item === active ? " active" : ""}" type="button" data-value="${item}">${item}</button>`).join("");
+      container.innerHTML = items.map((item) => `<button class="chip${item === active ? " active" : ""}" type="button" data-value="${escapeHtml(item)}">${escapeHtml(item)}</button>`).join("");
       container.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => onPick(button.dataset.value)));
     }
 
@@ -1140,7 +1088,7 @@
         renderGenres();
       });
       const genres = ["Все", ...new Set(source.flatMap((movie) => movie.genres))];
-      $("#genreBar").innerHTML = genres.map((genre) => `<button class="chip${genre === currentGenre ? " active" : ""}" type="button" data-genre="${genre}">${genre}</button>`).join("");
+      $("#genreBar").innerHTML = genres.map((genre) => `<button class="chip${genre === currentGenre ? " active" : ""}" type="button" data-genre="${escapeHtml(genre)}">${escapeHtml(genre)}</button>`).join("");
       $("#genreBar").querySelectorAll("button").forEach((button) => {
         button.addEventListener("click", () => {
           currentGenre = button.dataset.genre;
@@ -1178,7 +1126,7 @@
     function renderRandom() {
       const pool = smartRandomPool();
       randomMovie = pool.includes(randomMovie) ? randomMovie : (pool[0] || state.movies[0]);
-      $("#randomPoster").innerHTML = randomMovie ? `<img src="${poster(randomMovie)}" alt="${randomMovie.title}">` : "";
+      $("#randomPoster").innerHTML = randomMovie ? `<img src="${escapeHtml(poster(randomMovie))}" alt="${escapeHtml(randomMovie.title)}">` : "";
       $("#randomHint").textContent = currentMood === "Все" ? "Умный подбор" : currentMood;
     }
 
@@ -1227,12 +1175,12 @@
       if (!movie) return;
       currentDetailMovie = movie;
       randomMovie = movie;
-      $("#detailHero").style.backgroundImage = `url("${backdrop(movie)}")`;
+      $("#detailHero").style.backgroundImage = `url("${encodeURI(backdrop(movie))}")`;
       $("#detailTitle").textContent = movie.title;
-      $("#detailMeta").innerHTML = `<span>★ ${movie.rating}</span><span>${movie.year}</span><span>${movie.time}</span><span>HD</span><span>${movie.genres.join(", ")}</span>`;
-      $("#detailAdminPick").innerHTML = movie.adminPick ? `<span class="admin-pick">${movie.adminPick}</span>` : "";
+      $("#detailMeta").innerHTML = `<span>★ ${escapeHtml(movie.rating)}</span><span>${escapeHtml(movie.year)}</span><span>${escapeHtml(movie.time)}</span><span>HD</span><span>${escapeHtml(movie.genres.join(", "))}</span>`;
+      $("#detailAdminPick").innerHTML = movie.adminPick ? `<span class="admin-pick">${escapeHtml(movie.adminPick)}</span>` : "";
       $("#detailDescription").textContent = movie.description;
-      $("#detailReviews").innerHTML = movie.reviews.map((review) => `<div class="review"><b>${review.author}:</b> ${review.text}</div>`).join("");
+      $("#detailReviews").innerHTML = movie.reviews.map((review) => `<div class="review"><b>${escapeHtml(review.author)}:</b> ${escapeHtml(review.text)}</div>`).join("");
       updateDetailActions();
       detail.classList.add("active");
       detail.setAttribute("aria-hidden", "false");
@@ -1269,142 +1217,8 @@
       renderRecommended();
     }
 
-    function parseReviews(value) {
-      return value.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
-        const [author, ...text] = line.split(":");
-        return { author: text.length ? author.trim() : "Зритель", text: (text.length ? text.join(":") : line).trim() };
-      });
-    }
-
-    function openModal(id) {
-      $(id).classList.add("active");
-      $(id).setAttribute("aria-hidden", "false");
-    }
-
-    function closeModal(id) {
-      $(id).classList.remove("active");
-      $(id).setAttribute("aria-hidden", "true");
-    }
-
     function openAdminGate() {
       window.location.href = "admin.html";
-    }
-
-    function showAdmin() {
-      closeModal("#loginModal");
-      renderAdminSelect();
-      fillAdminForm(state.movies[0] || null);
-      openModal("#adminModal");
-    }
-
-    function renderAdminSelect() {
-      $("#adminMovieSelect").innerHTML = state.movies.map((movie) => `<option value="${movie.id}">${movie.title}</option>`).join("");
-    }
-
-    function fillAdminForm(movie) {
-      editingId = movie?.id || null;
-      $("#adminMovieSelect").value = editingId || "";
-      $("#adminTitle").value = movie?.title || "";
-      $("#adminPoster").value = movie?.poster || "";
-      $("#adminBackdrop").value = movie?.backdrop || "";
-      $("#adminYear").value = movie?.year || new Date().getFullYear();
-      $("#adminTime").value = movie?.time || "";
-      $("#adminRating").value = movie?.rating || "";
-      $("#adminGenres").value = movie?.genres?.join(", ") || "";
-      $("#adminDescription").value = movie?.description || "";
-      $("#adminReviews").value = (movie?.reviews || []).map((review) => `${review.author}: ${review.text}`).join("\n");
-      const placements = { ...defaultPlacements, ...(movie?.placements || {}) };
-      $("#placeHome").checked = placements.home;
-      $("#placeRecommended").checked = placements.recommended;
-      $("#placeGenres").checked = placements.genres;
-      $("#placeRandom").checked = placements.random;
-      $("#apiKey").value = state.apiKey || "";
-    }
-
-    function saveAdminMovie() {
-      const title = $("#adminTitle").value.trim();
-      if (!title) {
-        alert("Введите название фильма.");
-        return;
-      }
-      const movie = {
-        id: editingId || `custom-${Date.now()}`,
-        title,
-        year: Number($("#adminYear").value) || new Date().getFullYear(),
-        time: $("#adminTime").value.trim() || "120 мин",
-        rating: Number($("#adminRating").value) || 0,
-        genres: $("#adminGenres").value.split(",").map((genre) => genre.trim()).filter(Boolean),
-        poster: $("#adminPoster").value.trim() || fallbackPoster,
-        backdrop: $("#adminBackdrop").value.trim() || $("#adminPoster").value.trim() || fallbackPoster,
-        description: $("#adminDescription").value.trim() || "Описание пока не добавлено.",
-        reviews: parseReviews($("#adminReviews").value) || [],
-        placements: {
-          home: $("#placeHome").checked,
-          recommended: $("#placeRecommended").checked,
-          genres: $("#placeGenres").checked,
-          random: $("#placeRandom").checked
-        }
-      };
-      if (!movie.genres.length) movie.genres = ["Без жанра"];
-      if (!movie.reviews.length) movie.reviews = [{ author: "Админ", text: "Добавлено вручную." }];
-      const index = state.movies.findIndex((item) => item.id === movie.id);
-      if (index >= 0) state.movies[index] = movie;
-      else state.movies.unshift(movie);
-      state.apiKey = $("#apiKey").value.trim();
-      saveState();
-      activeIndex = 0;
-      renderAll();
-      renderAdminSelect();
-      fillAdminForm(movie);
-    }
-
-    function deleteAdminMovie() {
-      if (!editingId) return;
-      const movie = state.movies.find((item) => item.id === editingId);
-      if (!movie || !confirm(`Удалить "${movie.title}"?`)) return;
-      state.movies = state.movies.filter((item) => item.id !== editingId);
-      saveState();
-      activeIndex = 0;
-      renderAll();
-      renderAdminSelect();
-      fillAdminForm(state.movies[0] || null);
-    }
-
-    async function loadTmdbMovies() {
-      const key = $("#apiKey").value.trim();
-      if (!key) {
-        alert("Вставьте TMDb API key в поле выше.");
-        return;
-      }
-      state.apiKey = key;
-      saveState();
-      try {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${encodeURIComponent(key)}&language=ru-RU&page=1`);
-        if (!response.ok) throw new Error("TMDb error");
-        const data = await response.json();
-        const imported = data.results.slice(0, 10).map((item) => ({
-          id: `tmdb-${item.id}`,
-          title: item.title || item.original_title,
-          year: (item.release_date || "").slice(0, 4) || "2026",
-          time: "TMDb",
-          rating: Number(item.vote_average || 0).toFixed(1),
-          genres: ["TMDb", "Популярное"],
-          poster: item.poster_path ? imageBase + item.poster_path : fallbackPoster,
-          backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w1280" + item.backdrop_path : "",
-          description: item.overview || "Описание будет доступно после обновления данных TMDb.",
-          reviews: [{ author: "TMDb", text: `Средняя оценка зрителей: ${Number(item.vote_average || 0).toFixed(1)}.` }, { author: "Movie Mood", text: "Добавлено из популярной подборки TMDb." }],
-          placements: { home: true, recommended: false, genres: true, random: true }
-        }));
-        const known = new Set(state.movies.map((movie) => movie.id));
-        state.movies = [...imported.filter((movie) => !known.has(movie.id)), ...state.movies];
-        saveState();
-        activeIndex = 0;
-        renderAll();
-        renderAdminSelect();
-        alert("Фильмы TMDb загружены.");
-      } catch {
-        alert("Не удалось загрузить TMDb. Проверьте ключ и интернет.");
-      }
     }
 
     function renderAll() {
@@ -1439,20 +1253,6 @@
     });
     $("#searchInput").addEventListener("input", scheduleSearch);
     $("#adminEntry").addEventListener("click", openAdminGate);
-    $("#closeLogin").addEventListener("click", () => closeModal("#loginModal"));
-    $("#closeAdmin").addEventListener("click", () => closeModal("#adminModal"));
-    $("#loginBtn").addEventListener("click", () => {
-      if ($("#adminPassword").value === ADMIN_PASSWORD) showAdmin();
-      else alert("Неверный пароль.");
-    });
-    $("#adminPassword").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") $("#loginBtn").click();
-    });
-    $("#adminMovieSelect").addEventListener("change", () => fillAdminForm(state.movies.find((movie) => movie.id === $("#adminMovieSelect").value)));
-    $("#newMovieBtn").addEventListener("click", () => fillAdminForm(null));
-    $("#deleteMovieBtn").addEventListener("click", deleteAdminMovie);
-    $("#saveMovieBtn").addEventListener("click", saveAdminMovie);
-    $("#loadTmdb").addEventListener("click", loadTmdbMovies);
     $("#randomBtn").addEventListener("click", () => {
       const pool = smartRandomPool();
       randomMovie = pool[Math.floor(Math.random() * pool.length)] || state.movies[0];
@@ -1474,8 +1274,6 @@
       if (event.key === "Escape") {
         closeDetail();
         closeTrailer();
-        closeModal("#loginModal");
-        closeModal("#adminModal");
       }
       if (currentTab === "home" && event.key === "ArrowRight") moveDeck(1);
       if (currentTab === "home" && event.key === "ArrowLeft") moveDeck(-1);
@@ -1500,7 +1298,7 @@
     const isLocalPreview = ["127.0.0.1", "localhost"].includes(location.hostname);
     if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js?v=13").catch(() => {});
+        navigator.serviceWorker.register("service-worker.js?v=14").catch(() => {});
       });
     }
   </script>

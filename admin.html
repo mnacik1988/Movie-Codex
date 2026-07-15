@@ -187,6 +187,11 @@
     const STORAGE_KEY = "movieMoodState";
     const fallbackPoster = "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=780&q=80";
     const $ = (selector) => document.querySelector(selector);
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[char]));
+    }
     let movies = [];
     let cloudMode = isFirebaseEnabled();
     let signedIn = !cloudMode;
@@ -274,12 +279,12 @@
       }
       container.innerHTML = movies.map((movie) => `
         <article class="movie-item">
-          <img src="${movie.poster || fallbackPoster}" alt="">
+          <img src="${escapeHtml(movie.poster || fallbackPoster)}" alt="">
           <span>
-            <h3>${movie.title}</h3>
-            <p>${movie.year || ""} · ★ ${movie.rating || 0} · ${(movie.genres || []).join(", ")}</p>
+            <h3>${escapeHtml(movie.title)}</h3>
+            <p>${escapeHtml(movie.year || "")} · ★ ${escapeHtml(movie.rating || 0)} · ${escapeHtml((movie.genres || []).join(", "))}</p>
           </span>
-          <button class="ghost" type="button" data-edit="${movie.id}">Править</button>
+          <button class="ghost" type="button" data-edit="${escapeHtml(movie.id)}">Править</button>
         </article>
       `).join("");
       container.querySelectorAll("[data-edit]").forEach((button) => {
