@@ -1,4 +1,4 @@
-const CACHE_NAME = "movie-mood-v14";
+const CACHE_NAME = "movie-mood-v15";
 const APP_SHELL = [
   "./",
   "./index.html",
